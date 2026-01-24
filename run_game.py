@@ -20,12 +20,18 @@ else:
 
 print("""
     Here are the inputs:
+    
+     -----------------
     | 0,0 | 0,1 | 0,2 |
+     -----------------
     | 1,0 | 1,1 | 1,2 |
+     -----------------
     | 2,0 | 2,1 | 2,2 |
+     -----------------
       
     To quit, enter "q"
     """)
+
 
 if p == -1:
     print("You are going first")
@@ -35,15 +41,17 @@ if p == -1:
     b, status = make_player_move(p,b,m)
     print("The Computer is making its first move")
     b, status = make_computer_move(c,b)
+    turns_taken = 2
 
 if p == 1:
     print("The Computer is going first")
     b, status = make_computer_move(-1,b)
+    turns_taken = 1
 
 status = False
 winner = 0
 
-while status is False:
+while turns_taken != 9 and status is False:
     print(f"Your move. Here is the board. You are {p_name} and The Computer is {c_name}")
 
     prettify_board(b)
@@ -55,18 +63,22 @@ while status is False:
             if m == "q":
                 exit()
             b, status = make_player_move(p,b,m)
+            turns_taken += 1
             valid_move = True
             if status == True:
                 print("\nCongrats! You Won!")
                 winner = p
         except ValueError:
             print("An error occurred, try again")
-    if status is False:
+    if turns_taken != 9 and status is False:
         b, status = make_computer_move(c,b)
+        turns_taken += 1
         if status == True:
             print("\nOh no! The Computer won :(")
             winner = c
 
-if status:
-    print("\nHere's the final board:")
-    prettify_board(b)
+if status is False:
+    print("It was a stalemate")
+print("\nHere's the final board:")
+prettify_board(b)
+

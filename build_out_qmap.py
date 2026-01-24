@@ -44,7 +44,7 @@ for turn in range(0,9):
     possible_states.append(new_states)
     previous_states = new_states
 
-print(f"Length of new_rows: {len(new_rows)}")
+print(f"Length of new_rows: {len(new_rows)}") # 294,778
 df = pd.concat(new_rows)
 print(df)
 df.to_csv("qmap.csv")
@@ -55,8 +55,9 @@ for possible_state_list in possible_states:
     for possible_state in possible_state_list:
         possible_states_flat.append(possible_state)
 
-print(f"Length of possible_states_flat: {len(possible_states_flat)}") # This was 986410 before pruning out winning games
-#340858
-print(f"Number of possible actions to train for: {possible_action_count}")
+print(f"Length of possible_states_flat: {len(possible_states_flat)}") # This was 986,410 before pruning out winning games
+#Now it is 340,858
+
+print(f"Number of possible actions to train for: {possible_action_count}") # 549,945
 # The length of df and the number of possible states does not match.
 # This is because the list of states include winning and end states which do not appear in df.
