@@ -1,1 +1,2 @@
 # xoxo_gossip_giRL
+The goal of this project is to create and train a Reinforcement Learning Model from scratch that is able to play the simple game "Xs and Os" (which you may know by the name "Tic-Tac-Toe" or "Noughts and Crosses").
