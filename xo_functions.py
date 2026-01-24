@@ -38,13 +38,13 @@ def make_move(p, b, mr, mc, debug = False):
     
 #print("To create a new board where the first player has taken the top left corner, run b, status = make_move(-1,[[0,0,0],[0,0,0],[0,0,0]],0,0)")
 
-def determine_legal_moves(b):
-    allowable_moves = []
+def get_possible_moves(b):
+    possible_moves = []
     for ir, row in enumerate(b):
         for ic, row_x_column in enumerate(row):
             if row_x_column == 0:
-                allowable_moves.append((ir,ic))
-    return allowable_moves
+                possible_moves.append((ir,ic))
+    return possible_moves
 
 def make_player_move(p,b,m):
     mr, mc = m.split(",")
@@ -53,8 +53,8 @@ def make_player_move(p,b,m):
     return b, status
 
 def make_computer_move(p,b):
-    lm = determine_legal_moves(b)
-    m = random.choice(lm)
+    pm = get_possible_moves(b)
+    m = random.choice(pm)
     print(f"Computer's move is {m}")
     b, status = make_move(p,b,m[0],m[1])
     return b, status
