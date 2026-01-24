@@ -9,6 +9,8 @@ def create_name(state):
 init = [[0,0,0],[0,0,0],[0,0,0]]
 possible_states = [[init]]
 previous_states = [init]
+possible_action_count = 0
+
 
 cols = ["00", "01", "02", "10", "11", "12", "20", "21", "22"]
 df = pd.DataFrame(columns = cols)
@@ -30,6 +32,7 @@ for turn in range(0,9):
         new_row = pd.DataFrame(columns = cols, index = [str(starting_state)])
         actions = get_possible_moves(starting_state)
         for action in actions:
+            possible_action_count += 1
             action_str = create_name(action)
             new_row[action_str] = [0]
             new_state = [row[:] for row in starting_state] # Thank you, random redditor, for your help here
@@ -54,5 +57,6 @@ for possible_state_list in possible_states:
 
 print(f"Length of possible_states_flat: {len(possible_states_flat)}") # This was 986410 before pruning out winning games
 #340858
+print(f"Number of possible actions to train for: {possible_action_count}")
 # The length of df and the number of possible states does not match.
 # This is because the list of states include winning and end states which do not appear in df.
