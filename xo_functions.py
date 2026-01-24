@@ -58,3 +58,14 @@ def make_computer_move(p,b):
     print(f"Computer's move is {m}")
     b, status = make_move(p,b,m[0],m[1])
     return b, status
+
+def prettify_board(b):
+    map = {-1: "X", 1: "O", 0: " "}
+    print("")
+    vert = " -----------" 
+    print(vert)
+    for row in b:
+        new = f"| {map[row[0]]} | {map[row[1]]} | {map[row[2]] } |"
+        print(new)
+        print(vert)
+    print("")

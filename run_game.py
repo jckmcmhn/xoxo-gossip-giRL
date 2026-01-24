@@ -1,16 +1,20 @@
-from xo_functions import make_player_move, make_computer_move
+from xo_functions import make_player_move, make_computer_move, prettify_board
 
 b = [[0,0,0],[0,0,0],[0,0,0]]
 
-player_name = input("Are you X (going first) or O (going second)? ").lower()
-if player_name == "x":
+x_or_o = input("Are you X (going first) or O (going second)? ").upper()
+if x_or_o == "X":
     print("You are X")
     p = -1
+    p_name = "X"
     c = 1
-elif player_name in ["o", "0"]:
+    c_name = "O"
+elif x_or_o in ["O", "0"]:
     print("You are O")
     p = 1
+    p_name = "O"
     c = -1
+    c_name = "X"
 else:
     print("Invalid input")
 
@@ -40,10 +44,10 @@ status = False
 winner = 0
 
 while status is False:
-    print(f"Your move. Here is the board. You are {p} and The Computer is {c}")
-    print(b[0])
-    print(b[1])
-    print(b[2])
+    print(f"Your move. Here is the board. You are {p_name} and The Computer is {c_name}")
+
+    prettify_board(b)
+
     valid_move = False
     while valid_move is False:
         try:
@@ -53,18 +57,16 @@ while status is False:
             b, status = make_player_move(p,b,m)
             valid_move = True
             if status == True:
-                print("Congrats! You Won!")
+                print("\nCongrats! You Won!")
                 winner = p
         except ValueError:
             print("An error occurred, try again")
     if status is False:
         b, status = make_computer_move(c,b)
         if status == True:
-            print("Oh no! The Computer won :(")
+            print("\nOh no! The Computer won :(")
             winner = c
 
 if status:
-    print("Here's the final board")
-    print(b[0])
-    print(b[1])
-    print(b[2])
+    print("\nHere's the final board:")
+    prettify_board(b)
