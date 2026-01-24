@@ -1,4 +1,4 @@
-from xo_functions import determine_legal_moves, check_for_winner
+from xo_functions import get_possible_moves, check_for_winner
 import re
 import pandas as pd
 
@@ -28,7 +28,7 @@ for turn in range(0,9):
         print(f"State: {i}", end='\r')
         i += 1
         new_row = pd.DataFrame(columns = cols, index = [str(starting_state)])
-        actions = determine_legal_moves(starting_state)
+        actions = get_possible_moves(starting_state)
         for action in actions:
             action_str = create_name(action)
             new_row[action_str] = [0]
@@ -41,24 +41,18 @@ for turn in range(0,9):
     possible_states.append(new_states)
     previous_states = new_states
 
+print(f"Length of new_rows: {len(new_rows)}")
+df = pd.concat(new_rows)
+print(df)
+df.to_csv("qmap.csv")
+
+### Everything below this point was part of an approach which in the end was not necessary
 possible_states_flat = []
 for possible_state_list in possible_states:
     for possible_state in possible_state_list:
         possible_states_flat.append(possible_state)
 
-print(f"Length of new_rows: {len(new_rows)}")
-df = pd.concat(new_rows) # TODO: confirm new index
-print(df)
-
 print(f"Length of possible_states_flat: {len(possible_states_flat)}") # This was 986410 before pruning out winning games
 #340858
-print(f"Length of df: {len(df)}")
-
-df.to_csv("qmap.csv")
-
-print("----------------")
-
-
-#for s in possible_states_flat:
-#    if str(s) not in df.index:
-#        print(s)
+# The length of df and the number of possible states does not match.
+# This is because the list of states include winning and end states which do not appear in df.

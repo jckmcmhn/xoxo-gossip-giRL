@@ -1,4 +1,4 @@
-from xo_functions import make_move, determine_legal_moves, make_player_move, make_computer_move
+from xo_functions import make_player_move, make_computer_move
 
 b = [[0,0,0],[0,0,0],[0,0,0]]
 
