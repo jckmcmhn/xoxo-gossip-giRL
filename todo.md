@@ -36,3 +36,4 @@
 - separate file to track model metadata (esp number of episodes)
 - add separate arguments for player 2 model
 - log when a player claims the middle square and wins
+- get the board to print in same part of screen each time
