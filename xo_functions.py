@@ -156,12 +156,13 @@ class Player:
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
         #print(f"Making decision for state: {b}")
-        hits = self.model_df[self.model_df["state"] == str(b)][columns].head(1)
+        hits = self.model_df[self.model_df["state"] == str(b)][columns]#.head(1)
         hits = hits.transpose()
         hits.columns = ["values"]
         hits = hits.reset_index()
+        #print(hits["values"])
         max_value = np.nanmax(hits["values"]) # seems bizzare to have to do this, but if the first value is nan then regular max screws up
-        #print(f"max value {max_value}")
+        print(f"max value {max_value}")
         top_answers = hits[hits["values"] == max_value]
         m = str(random.choice(list(top_answers["index"])))
         mr, mc = int(m[0]), int(m[1])

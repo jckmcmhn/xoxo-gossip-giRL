@@ -24,22 +24,16 @@ p2 = Player("Gregg",file,False)
 p1.greet()
 p2.greet()
 
-x_player_wins = 0
-o_player_wins = 0
+x_wins, o_wins = 0, 0 # These are wins for X or O
 stalemates = 0
 for episode in range(0,n):
-    if 0 == episode % 2:
-        x_player = p1
-        o_player = p2
+    if 0 == episode % 2: # alternate who goes first
+        x_player, o_player = p1, p2
     else:
-        x_player = p2
-        o_player = p1
-    x_player_m = []
-    o_player_m = []
-    x_player_b = []
-    o_player_b = []
+        x_player, o_player = p2, p1
+    x_player_m, o_player_m, x_player_b, o_player_b = [], [], [], []
 
-    print(f"-----------------")
+    print(f"----------------------------------")
     print(f"Episode {episode + 1}: {x_player.name} is X and {o_player.name} is O")
 
     b = [[0,0,0],[0,0,0],[0,0,0]]
@@ -74,7 +68,7 @@ for episode in range(0,n):
             print(f"{x_player.name} (playing as X) won.\n")
             if not demo_mode:
                 prettify_board(b)
-            x_player_wins += 1
+            x_wins += 1
             x_player.wins += 1
             x_player.wins_as_x += 1
             #print(x_player_m)
@@ -84,7 +78,7 @@ for episode in range(0,n):
             if not demo_mode:
                 print("Final board")
                 prettify_board(b)
-            o_player_wins += 1
+            o_wins += 1
             o_player.wins += 1
     if status == 2:
         print("It was a stalemate")
@@ -92,8 +86,8 @@ for episode in range(0,n):
     if demo_mode:
         sleep(delay * 1.5)
 
-print(f"\nX wins: {x_player_wins}")
-print(f"O wins: {o_player_wins}")
+print(f"\nX wins: {x_wins}")
+print(f"O wins: {o_wins}")
 print(f"Stalemates: {stalemates}")
 if p1.wins != 0:
     print(f"\n{p1.name} total wins: {p1.wins}. Of those, {p1.wins_as_x} ({round(100 * p1.wins_as_x / p1.wins, 2)}%) were as X.")
