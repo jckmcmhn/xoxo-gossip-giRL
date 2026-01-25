@@ -2,7 +2,7 @@
 
 ## Key Functionality
 - check_for_winner should identify stalemates
-    - if X wins -1
+    - if X wins -1 (?)
     - if O wins 1
     - if no winner 0 (zero, not "oh", really made a rod for my own back with that one)
     - if stalemate 2
@@ -25,5 +25,9 @@
 - train a "winner model" where the weights *only* reward winning a match
     - compare this performance to the model which is rewarded for winning or stalemates
 - second baseline: computer player that has some pre-written rules but otherwise chooses at random
-    - always pick the middle square if it available
+    - always pick the middle square if it is available
     - if you have a winning move, always take it
+- look into setting up a linter to tidy the code
+- apparently the accepted naming convention for git repos uses hyphens
+- can probably predict stalemates a turn or two, before they happen, but let's not get ahead of ourselves
+- separate file to track model metadata (esp number of episodes)
