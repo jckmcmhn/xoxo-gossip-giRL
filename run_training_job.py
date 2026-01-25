@@ -81,14 +81,5 @@ for episode in range(0,n):
 print(f"\nX wins: {x_player_wins}")
 print(f"O wins: {o_player_wins}")
 print(f"Stalemates: {stalemates}")
-
-# Even when just picking at random, the player who goes first wins more often
-# After 1000 games of totally naive players, no learning in place:
-# X wins: 598
-# O wins: 262
-# Stalemates: 140
-# P1 total wins: 451. Of those, 306 (67.85) were as X.
-# P2 total wins: 409. Of those, 292 (71.39) were as X.
-
 print(f"\n{p1.name} total wins: {p1.wins}. Of those, {p1.wins_as_x} ({round(100 * p1.wins_as_x / p1.wins, 2)}) were as X.")
 print(f"{p2.name} total wins: {p2.wins}. Of those, {p2.wins_as_x} ({round(100 * p2.wins_as_x / p2.wins, 2)}) were as X.")
