@@ -34,3 +34,5 @@
 - apparently the accepted naming convention for git repos uses hyphens
 - can probably predict stalemates a turn or two, before they happen, but let's not get ahead of ourselves
 - separate file to track model metadata (esp number of episodes)
+- add separate arguments for player 2 model
+- log when a player claims the middle square and wins
