@@ -12,6 +12,8 @@
 - script to allow two computer players to play against each other
     - whether either are RL-model based or just pick moves at random should be configurable
 - baseline: run two computer players who pick moves at random against eachother. They should be evenly matched
+- the qmap has duplicates eg [[0, -1, 0], [0, 0, 0], [1, 0, -1]] must remove. many for [[-1, 1, 0], [0, 0, 0], [1, -1, -1]]
+- it's missing some states? [[0, 1, -1], [1, 0, -1], [-1, 1, -1]] # WRONG, that's a state were -1 already won
 
 ## Documentation
 - "user manual" for running the training from scratch

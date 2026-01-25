@@ -7,13 +7,20 @@ def check_for_winner_v2(b, tt):
     :param b: The current board (state)
     :param tt: Turns taken up to now
     """
-    if tt < 5: # No one can win before the fifth move
+#    print(b)
+#    print(f"tt is {tt}")
+    if tt < 4: # No one can win before the fifth move, if tt is 4 we're assessing the 5th #TODO: c'mon now...
+#        print("stopping check early")
         return 0, ""
-    elif sum(b[0]) in [-3,3]: # is the first row a winner
+#    print("Doing rest of check")
+    if sum(b[0]) in [-3,3]: # is the first row a winner
+#        print("r1")
         return 1, "r1"
     elif sum(b[1]) in [-3,3]: # is the second row a winner
+#        print("r2")
         return 1, "r2"
     elif sum(b[2]) in [-3,3]: # is the third row a winner
+#        print("r3")
         return 1, "r3"
     elif (b[0][0] + b[1][0] + b[2][0]) in [-3,3]: # is the first column a winning column
         return 1, "c1"
@@ -26,7 +33,8 @@ def check_for_winner_v2(b, tt):
     elif (b[0][2] + b[1][1] + b[2][0]) in [-3,3]: # is the bottom left to top right diagonal a winner
         return 1, "d2"
     else:
-        if tt == 9:
+        if tt == 8: #See TODO above
+            print("STALEMATE")
             return 2, "s" # Stalemate
         else:
             return 0, ""
