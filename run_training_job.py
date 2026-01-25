@@ -1,10 +1,9 @@
 import argparse
-import pandas as pd
-from xo_functions import make_move_v2, make_move, prettify_board, get_possible_moves
-import random
-import numpy as np
+from xo_functions import prettify_board, Player
+from time import sleep
 
-columns = ["00", "01", "02", "10", "11", "12", "20", "21", "22"]
+delay = 0.7 #TODO: Should be an argument
+demo_mode = False #TODO: Should be an argument
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--file", help = "What file are you using to load or save the model weights?")
@@ -20,52 +19,15 @@ n = int(args.number_of_episodes)
 reward_win, reward_lose, reward_draw = args.rewards.split("|")
 reward_win, reward_lose, reward_draw = int(reward_win), int(reward_lose), int(reward_draw)
 
-model_df = pd.read_csv(file)
-
-print(model_df)
-
-class player:
-    def __init__(self, name, file, learning):
-        self.name = name
-        self.file = file
-        self.model_df = pd.read_csv(self.file)
-        self.model_df.columns = ["state"] + columns
-        self.learning = learning
-
-    def greet(self):
-        if self.learning:
-            print(f"Hello, my name is {self.name}. I'm an agent in this Reinforcement Learning scenario and I learn as I play the game.")
-            print(f"My model has {len(self.model_df)} rows")
-        else:
-            print(f"Hello, my name is {self.name}. I'm an agent in this Reinforcement Learning scenario and I'm committed to not learning a damn thing.")
-        print(f"My model is stored in this location {file} and it has had #TODO training episodes so far")
-
-    def make_model_move(self,b,tt,p):
-        #print(f"Turns taken so far {tt}")
-        #print(f"Making decision for state: {b}")
-        hits = self.model_df[self.model_df["state"] == str(b)][columns].head(1)
-        hits = hits.transpose()
-        hits.columns = ["values"]
-        hits = hits.reset_index()
-        max_value = np.nanmax(hits["values"]) # seems bizzare to have to do this, but if the first value is nan then regular max screws up
-        #print(f"max value {max_value}")
-        top_answers = hits[hits["values"] == max_value]
-        m = str(random.choice(list(top_answers["index"])))
-        mr, mc = int(m[0]), int(m[1])
-        #print(f"{self.name}'s move is {m}")
-        b, status, description = make_move_v2(p,b,mr,mc,tt)
-        return b, status, description, m
-
-p1 = player("Rolf",file,True)
+p1 = Player("Rolf",file,True)
+p2 = Player("Gregg",file,False)
 p1.greet()
-p2 = player("Gregg",file,False)
-#p2.greet()
+p2.greet()
 
 x_player_wins = 0
 o_player_wins = 0
 stalemates = 0
 for episode in range(0,n):
-    print(f"episode {episode}")
     if 0 == episode % 2:
         x_player = p1
         o_player = p2
@@ -76,6 +38,10 @@ for episode in range(0,n):
     o_player_m = []
     x_player_b = []
     o_player_b = []
+
+    print(f"-----------------")
+    print(f"Episode {episode + 1}: {x_player.name} is X and {o_player.name} is O")
+
     b = [[0,0,0],[0,0,0],[0,0,0]]
     status = 0
     tt = 0
@@ -85,6 +51,10 @@ for episode in range(0,n):
         tt += 1
         x_player_m.append(m)
         x_player_b.append(b)
+        if demo_mode:
+            print(f"{x_player.name}'s turn.")
+            prettify_board(b)
+            sleep(delay * 0.5)
         #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
         if status == 0 and tt != 9: # I'd forgotten this check at first.
             #Interestingly, when the players just picked at random, it always took up to the 7 turns taken for this to become a problem
@@ -93,27 +63,43 @@ for episode in range(0,n):
             tt += 1
             o_player_m.append(m)
             o_player_b.append(b)
+            if demo_mode:
+                print(f"{o_player.name}'s turn.")
+                prettify_board(b)
+                sleep(delay * 0.5)
             #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
-    print(f"final status {status}")
-    prettify_board(b)
+    print(f"This game is over\n")
     if status == 1:
         if x_turn:
-            print("X won.")
+            print(f"{x_player.name} (playing as X) won.\n")
+            if not demo_mode:
+                prettify_board(b)
             x_player_wins += 1
+            x_player.wins += 1
+            x_player.wins_as_x += 1
             #print(x_player_m)
             #print(x_player_b)
         else:
-            print("O won")
+            print(f"{o_player.name} (playing as O) won.\n")
+            if not demo_mode:
+                print("Final board")
+                prettify_board(b)
             o_player_wins += 1
+            o_player.wins += 1
     if status == 2:
-        print("no one won")
+        print("It was a stalemate")
         stalemates += 1
+    if demo_mode:
+        sleep(delay * 1.5)
 
-print(f"\nX wins {x_player_wins}")
-print(f"O wins {o_player_wins}")
-print(f"stalemates wins {stalemates}")
-
-# Even when just picking at random, the player who goes first wins more often
-# After 1000 games of totally naive players, no learning in place:
-# X won 598 games, O won 284
-# The remaining 118 were stalemates
+print(f"\nX wins: {x_player_wins}")
+print(f"O wins: {o_player_wins}")
+print(f"Stalemates: {stalemates}")
+if p1.wins != 0:
+    print(f"\n{p1.name} total wins: {p1.wins}. Of those, {p1.wins_as_x} ({round(100 * p1.wins_as_x / p1.wins, 2)}%) were as X.")
+else:
+    print(f"\n{p1.name} total wins: 0")
+if p2.wins != 0:
+    print(f"{p2.name} total wins: {p2.wins}. Of those, {p2.wins_as_x} ({round(100 * p2.wins_as_x / p2.wins, 2)}%) were as X.")
+else:
+    print(f"\n{p2.name} total wins: 0")

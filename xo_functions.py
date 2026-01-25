@@ -1,4 +1,8 @@
 import random
+import numpy as np
+import pandas as pd
+
+columns = ["00", "01", "02", "10", "11", "12", "20", "21", "22"]
 
 def check_for_winner_v2(b, tt):
     """
@@ -7,8 +11,6 @@ def check_for_winner_v2(b, tt):
     :param b: The current board (state)
     :param tt: Turns taken up to now
     """
-#    print(b)
-#    print(f"tt is {tt}")
     if tt < 4: # No one can win before the fifth move, if tt is 4 we're assessing the 5th #TODO: c'mon now...
 #        print("stopping check early")
         return 0, ""
@@ -131,3 +133,38 @@ def prettify_board(b):
         print(new)
         print(vert)
     print("")
+
+class Player:
+    def __init__(self, name, file, learning):
+        self.name = name
+        self.file = file
+        self.model_df = pd.read_csv(self.file)
+        self.model_df.columns = ["state"] + columns
+        self.learning = learning
+        self.wins = 0
+        self.wins_as_x = 0
+
+    def greet(self):
+        if self.learning:
+            print(f"Hello, my name is {self.name}. I'm an agent in this Reinforcement Learning scenario and I learn as I play the game.")
+            print(f"My model has {len(self.model_df)} rows")
+        else:
+            print(f"Hello, my name is {self.name}. I used to be an agent. I learned how to play the game across #TODO episodes.")
+            print(f"I REFUSE TO LEARN ANYTHING ELSE!")
+        print(f"My model is stored in this location {self.file}.\n")
+
+    def make_model_move(self,b,tt,p):
+        #print(f"Turns taken so far {tt}")
+        #print(f"Making decision for state: {b}")
+        hits = self.model_df[self.model_df["state"] == str(b)][columns].head(1)
+        hits = hits.transpose()
+        hits.columns = ["values"]
+        hits = hits.reset_index()
+        max_value = np.nanmax(hits["values"]) # seems bizzare to have to do this, but if the first value is nan then regular max screws up
+        #print(f"max value {max_value}")
+        top_answers = hits[hits["values"] == max_value]
+        m = str(random.choice(list(top_answers["index"])))
+        mr, mc = int(m[0]), int(m[1])
+        #print(f"{self.name}'s move is {m}")
+        b, status, description = make_move_v2(p,b,mr,mc,tt)
+        return b, status, description, m
