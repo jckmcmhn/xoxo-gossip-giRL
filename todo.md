@@ -12,8 +12,8 @@
 - script to allow two computer players to play against each other
     - whether either are RL-model based or just pick moves at random should be configurable
 - baseline: run two computer players who pick moves at random against eachother. They should be evenly matched
-- the qmap has duplicates eg [[0, -1, 0], [0, 0, 0], [1, 0, -1]] must remove. many for [[-1, 1, 0], [0, 0, 0], [1, -1, -1]]
-- it's missing some states? [[0, 1, -1], [1, 0, -1], [-1, 1, -1]] # WRONG, that's a state were -1 already won
+- ~~the qmap has duplicates eg [[0, -1, 0], [0, 0, 0], [1, 0, -1]] must remove. many for [[-1, 1, 0], [0, 0, 0], [1, -1, -1]]~~
+- ~~it's missing some states? [[0, 1, -1], [1, 0, -1], [-1, 1, -1]] # WRONG, that's a state were -1 already won~~
 
 ## Documentation
 - "user manual" for running the training from scratch
@@ -31,8 +31,8 @@
     - always pick the middle square if it is available
     - if you have a winning move, always take it
 - look into setting up a linter to tidy the code
-- apparently the accepted naming convention for git repos uses hyphens
-- can probably predict stalemates a turn or two, before they happen, but let's not get ahead of ourselves
+- ~~apparently the accepted naming convention for git repos uses hyphens~~
+- can probably predict stalemates a turn or two before they happen, but let's not get ahead of ourselves
 - separate file to track model metadata (esp number of episodes)
 - add separate arguments for player 2 model
 - log when a player claims the middle square and wins
