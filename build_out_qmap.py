@@ -12,7 +12,7 @@ previous_states = [init]
 possible_action_count = 0
 
 
-cols = ["00", "01", "02", "10", "11", "12", "20", "21", "22"]
+cols = ["state", "00", "01", "02", "10", "11", "12", "20", "21", "22"]
 df = pd.DataFrame(columns = cols)
 new_rows = []
 
@@ -29,7 +29,8 @@ for turn in range(0,9):
     for starting_state in previous_states:
         print(f"State: {i}", end='\r')
         i += 1
-        new_row = pd.DataFrame(columns = cols, index = [str(starting_state)])
+        new_row = pd.DataFrame(columns = cols)
+        new_row["state"] = [str(starting_state)]
         actions = get_possible_moves(starting_state)
         for action in actions:
             possible_action_count += 1
@@ -45,9 +46,11 @@ for turn in range(0,9):
     previous_states = new_states
 
 print(f"Length of new_rows: {len(new_rows)}") # 294,778
-df = pd.concat(new_rows)
+df = pd.concat(new_rows, ignore_index= True)
 print(df)
-df.to_csv("qmap.csv")
+df = df.drop_duplicates() #TODO: there might be a way to write the code above so that no duplicates are created in the first place
+print(df)
+df.to_csv("qmap.csv", index = False)
 
 ### Everything below this point was part of an approach which in the end was not necessary
 possible_states_flat = []
