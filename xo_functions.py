@@ -158,7 +158,7 @@ class Player:
         #print(f"Making decision for state: {b}")
         choice = random.choice([0,1])
         if (choice == 0): # Need episode to be available here, not tt
-            print("Making a random choice")
+            #print("Making a random choice")
             pm = get_possible_moves(b)
             m = random.choice(pm)
             mr, mc = int(m[0]), int(m[1])
