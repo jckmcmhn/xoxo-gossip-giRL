@@ -14,6 +14,7 @@
 - baseline: run two computer players who pick moves at random against eachother. They should be evenly matched
 - ~~the qmap has duplicates eg [[0, -1, 0], [0, 0, 0], [1, 0, -1]] must remove. many for [[-1, 1, 0], [0, 0, 0], [1, -1, -1]]~~
 - ~~it's missing some states? [[0, 1, -1], [1, 0, -1], [-1, 1, -1]] # WRONG, that's a state were -1 already won~~
+- Xs and Os is a "solved game". Does the model learn how to play a "perfect" game?
 
 ## Documentation
 - "user manual" for running the training from scratch
