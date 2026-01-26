@@ -1,5 +1,5 @@
 import argparse
-from xo_functions import prettify_board, Player
+from xo_functions import prettify_board, prettify_boards, Player
 from time import sleep
 
 delay = 0.2 #TODO: Should be an argument
@@ -19,8 +19,9 @@ n = int(args.number_of_episodes)
 reward_win, reward_lose, reward_draw = args.rewards.split("|")
 reward_win, reward_lose, reward_draw = int(reward_win), int(reward_lose), int(reward_draw)
 
-p1 = Player("Rolf",file,True)
-p2 = Player("Gregg",file,False)
+is_p2_learning = False
+p1 = Player("Tom (P1)",file,True)
+p2 = Player("Gregg (P2)",file,is_p2_learning)
 p1.greet()
 p2.greet()
 
@@ -35,6 +36,7 @@ for episode in range(0,n):
     
     p1.actions, p1.states, p2.actions, p2.states = [], [], [], []
     p1_actions, p1_states, p2_actions, p2_states = [], [], [], []
+    turn_end_states = []
 
     print(f"----------------------------------")
     print(f"Episode {episode + 1}: {x_player.name} is X and {o_player.name} is O")
@@ -47,7 +49,6 @@ for episode in range(0,n):
         if x_player.name == p1.name:
             p1_states.append(b)
         x_player.states.append(str(b)) # HAS TO BE A STRING, 
-        #x_player.states = x_player.states + [str(b)]
         x_player_b.append(b)
         x_turn = True
         b, status, description, m = x_player.make_model_move(b,tt,-1)
@@ -59,10 +60,10 @@ for episode in range(0,n):
             prettify_board(b)
             sleep(delay * 0.5)
         #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
-        if status == 0 and tt != 9: # I'd forgotten this check at first.
+        turn_end_states.append(str(b))
+        if status == 0 and tt != 9:
             o_player.states.append(str(b))
             o_player_b.append(b)
-            #Interestingly, when the players just picked at random, it always took up to the 7 turns taken for this to become a problem
             x_turn = False
             b, status, description, m = o_player.make_model_move(b,tt,1)
             tt += 1
@@ -73,6 +74,7 @@ for episode in range(0,n):
                 prettify_board(b)
                 sleep(delay * 0.5)
             #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
+            turn_end_states.append(str(b))
     print(f"This game is over\n")
     if status == 1:
         if x_turn:
@@ -95,15 +97,10 @@ for episode in range(0,n):
         
         # For now, let's take it that p1 is always the one we want to learn
         if winner == p1.name: #TODO: c'mon man
-            #print(f"Here is {p1.name}'s winning game summary.\n")
-
-            #print(p1.actions)
-            #print(p1.states)
-            #print(p1.model_df)
+            print(f"Here is {p1.name}'s winning game summary.\n")
+            prettify_boards(turn_end_states)
             for i, reinforce_action in enumerate(p1.actions):
-                #print(p1.model_df[str(action)][p1.states[i]])
-                #print(p1.model_df.loc[p1.model_df['state'] == "state", action].values)
-                #print(reinforce_action)
+                # reinforce_action so named to distinguish from actions which aren't necessarily to be reinforced
                 reinforce_state = p1.states[i]
                 before = p1.model_df[p1.model_df["state"] == str(reinforce_state)][reinforce_action]
                 #print("before")
@@ -114,9 +111,6 @@ for episode in range(0,n):
                 #print(after)
             #print(p1.model_df)
             #p1.model_df.to_csv(file, index = False)
-
-                #print(p1.model_df.loc[p1.model_df['state'] == "state", action].values)
-                #print(p1.model_df.loc[p1.model_df['state'] == "state", action])
 
     if status == 2:
         print("It was a stalemate")
@@ -137,8 +131,9 @@ else:
     print(f"\n{p2.name} total wins: 0")
 
 print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
-print("p1 model at end of training: ")
-print(p1.model_df)
+print("Here is the first few states of the p1 model at the end of training: ")
+print(p1.model_df[0:5])
 
-print("p2 model at end of training: ")
-print(p2.model_df) # This should show all zeroes
+if is_p2_learning:
+    print("p2 model at end of training: ")
+    print(p2.model_df) # This should show all zeroes

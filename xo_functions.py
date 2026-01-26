@@ -12,17 +12,12 @@ def check_for_winner_v2(b, tt):
     :param tt: Turns taken up to now
     """
     if tt < 4: # No one can win before the fifth move, if tt is 4 we're assessing the 5th #TODO: c'mon now...
-#        print("stopping check early")
         return 0, ""
-#    print("Doing rest of check")
     if sum(b[0]) in [-3,3]: # is the first row a winner
-#        print("r1")
         return 1, "r1"
     elif sum(b[1]) in [-3,3]: # is the second row a winner
-#        print("r2")
         return 1, "r2"
     elif sum(b[2]) in [-3,3]: # is the third row a winner
-#        print("r3")
         return 1, "r3"
     elif (b[0][0] + b[1][0] + b[2][0]) in [-3,3]: # is the first column a winning column
         return 1, "c1"
@@ -111,8 +106,9 @@ def get_possible_moves(b):
     return possible_moves
 
 def make_player_move(p,b,m):
-    mr, mc = m.split(",")
-    mr, mc = int(mr), int(mc)
+    map = {"a1": "00", "a2": "01", "a3": "02", "b1": "10", "b2": "11", "b3": "12", "c1": "20", "c2": "21", "c3": "22"}
+    m = map[m]
+    mr, mc = int(m[0]), int(m[1])
     b, status = make_move(p, b, mr, mc)
     return b, status
 
@@ -132,6 +128,32 @@ def prettify_board(b):
         new = f"| {map[row[0]]} | {map[row[1]]} | {map[row[2]] } |"
         print(new)
         print(vert)
+    print("")
+
+def prettify_boards(boards):
+    """
+    Docstring for prettify_boards
+    
+    :param boards: Should be a list of stringified states
+    """
+    map = {-1: "X", 1: "O", 0: " "}
+    print("")
+    vert = " ----------- "
+    top_row = ""
+    for i in boards:
+        top_row = top_row + "   " + vert
+    print(top_row)
+    for i in [0,1,2]:
+        row = ""
+        for board in boards:
+            board_row = eval(board)[i]
+            string = f"| {map[board_row[0]]} | {map[board_row[1]]} | {map[board_row[2]] } |"
+            row = row + " * " + string
+        print(row)
+    bottom_row = ""
+    for i in boards:
+        bottom_row = bottom_row + "   " + vert
+    print(bottom_row)
     print("")
 
 class Player:
