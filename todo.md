@@ -37,3 +37,5 @@
 - add separate arguments for player 2 model
 - log when a player claims the middle square and wins
 - get the board to print in same part of screen each time
+- implement a version of run_game.py script where the model is not allowed to choose 1,1 as it's first move, for variety
+- allow players to use the more intuitive a1, b2, c1 etc for "0,0", "1,1" and "2,0" respectively
