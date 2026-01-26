@@ -156,16 +156,26 @@ class Player:
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
         #print(f"Making decision for state: {b}")
-        hits = self.model_df[self.model_df["state"] == str(b)][columns]#.head(1)
-        hits = hits.transpose()
-        hits.columns = ["values"]
-        hits = hits.reset_index()
-        #print(hits["values"])
-        max_value = np.nanmax(hits["values"]) # seems bizzare to have to do this, but if the first value is nan then regular max screws up
-        print(f"max value {max_value}")
-        top_answers = hits[hits["values"] == max_value]
-        m = str(random.choice(list(top_answers["index"])))
-        mr, mc = int(m[0]), int(m[1])
-        #print(f"{self.name}'s move is {m}")
+        choice = random.choice([0,1])
+        if (choice == 0): # Need episode to be available here, not tt
+            print("Making a random choice")
+            pm = get_possible_moves(b)
+            m = random.choice(pm)
+            mr, mc = int(m[0]), int(m[1])
+            m = str(m[0]) + str(m[1])
+        else:
+            # Using model choice
+            print("Using the model's preferred choice")
+            hits = self.model_df[self.model_df["state"] == str(b)][columns]#.head(1)
+            hits = hits.transpose()
+            hits.columns = ["values"]
+            hits = hits.reset_index()
+            max_value = np.nanmax(hits["values"]) # seems bizzare to have to do this, but if the first value is nan then regular max screws up
+            #print(f"max value {max_value}")
+            top_answers = hits[hits["values"] == max_value]
+            m = str(random.choice(list(top_answers["index"])))
+            mr, mc = int(m[0]), int(m[1])
+            #print(f"{self.name}'s move is {m}")
+
         b, status, description = make_move_v2(p,b,mr,mc,tt)
         return b, status, description, m

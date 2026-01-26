@@ -95,11 +95,11 @@ for episode in range(0,n):
         
         # For now, let's take it that p1 is always the one we want to learn
         if winner == p1.name: #TODO: c'mon man
-            print(f"Here is {p1.name}'s winning game summary.\n")
+            #print(f"Here is {p1.name}'s winning game summary.\n")
 
-            print(p1.actions)
-            print(p1.states)
-            print(p1.model_df)
+            #print(p1.actions)
+            #print(p1.states)
+            #print(p1.model_df)
             for i, reinforce_action in enumerate(p1.actions):
                 #print(p1.model_df[str(action)][p1.states[i]])
                 #print(p1.model_df.loc[p1.model_df['state'] == "state", action].values)
@@ -112,7 +112,7 @@ for episode in range(0,n):
                 after = p1.model_df[p1.model_df["state"] == str(reinforce_state)][reinforce_action]
                 #print("after")
                 #print(after)
-            print(p1.model_df)
+            #print(p1.model_df)
             #p1.model_df.to_csv(file, index = False)
 
                 #print(p1.model_df.loc[p1.model_df['state'] == "state", action].values)
@@ -136,5 +136,9 @@ if p2.wins != 0:
 else:
     print(f"\n{p2.name} total wins: 0")
 
+print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
 print("p1 model at end of training: ")
 print(p1.model_df)
+
+print("p2 model at end of training: ")
+print(p2.model_df) # This should show all zeroes
