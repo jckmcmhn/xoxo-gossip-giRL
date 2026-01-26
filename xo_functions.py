@@ -188,7 +188,7 @@ class Player:
         else:
             # Using model choice
             print("Using the model's preferred choice")
-            hits = self.model_df[self.model_df["state"] == str(b)][columns]#.head(1)
+            hits = self.model_df[self.model_df["state"] == str(b)][columns]
             hits = hits.transpose()
             hits.columns = ["values"]
             hits = hits.reset_index()
