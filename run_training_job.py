@@ -57,7 +57,7 @@ for episode in range(0,n):
         x_player.actions.append(m)
         if demo_mode:
             print(f"{x_player.name}'s turn.")
-            prettify_board(b)
+            prettify_board(b, m)
             sleep(delay * 0.5)
         #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
         turn_end_states.append(str(b))
@@ -71,7 +71,7 @@ for episode in range(0,n):
             o_player.actions.append(m)
             if demo_mode:
                 print(f"{o_player.name}'s turn.")
-                prettify_board(b)
+                prettify_board(b, m)
                 sleep(delay * 0.5)
             #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
             turn_end_states.append(str(b))
