@@ -50,7 +50,7 @@ df = pd.concat(new_rows, ignore_index= True)
 print(df)
 df = df.drop_duplicates() #TODO: there might be a way to write the code above so that no duplicates are created in the first place
 print(df)
-df.to_csv("qmap.csv", index = False)
+df.to_csv("q_learning_table.csv", index = False)
 
 ### Everything below this point was part of an approach which in the end was not necessary
 possible_states_flat = []
