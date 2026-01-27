@@ -21,8 +21,8 @@ reward_win, reward_lose, reward_draw = args.rewards.split("|")
 reward_win, reward_lose, reward_draw = float(reward_win), float(reward_lose), float(reward_draw)
 
 is_p2_learning = False
-p1 = Player("Tom (P1)",file,True, reward_win)
-p2 = Player("Gregg (P2)",file,is_p2_learning)
+p1 = Player("Tom (P1)",file,"LEARNING", reward_win)
+p2 = Player("Gregg (P2)",file,"NOT_LEARNING")
 p1.greet()
 p2.greet()
 
@@ -52,7 +52,7 @@ for episode in range(0,n):
         x_player.states.append(str(b)) # HAS TO BE A STRING, 
         x_player_b.append(b)
         x_turn = True
-        b, status, description, m = x_player.make_model_move(b,tt,-1)
+        b, status, description, m = x_player.make_agent_move(b,tt,-1)
         tt += 1
         x_player_m.append(m)
         x_player.actions.append(m)
@@ -66,7 +66,7 @@ for episode in range(0,n):
             o_player.states.append(str(b))
             o_player_b.append(b)
             x_turn = False
-            b, status, description, m = o_player.make_model_move(b,tt,1)
+            b, status, description, m = o_player.make_agent_move(b,tt,1)
             tt += 1
             o_player_m.append(m)
             o_player.actions.append(m)

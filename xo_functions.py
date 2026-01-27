@@ -157,24 +157,58 @@ def prettify_boards(boards):
     print("")
 
 class Player:
-    def __init__(self, name, file, learning, reward_win = 0):
+    def __init__(self, name, file, mode, reward_win = 0):
         self.name = name
         self.file = file
         self.model_df = pd.read_csv(self.file)
         self.model_df.columns = ["state"] + columns
-        self.learning = learning
+        self.mode = mode
         self.reward_win = reward_win
         self.wins = 0
         self.wins_as_x = 0
 
     def greet(self):
-        if self.learning:
-            print(f"Hello, my name is {self.name}. I'm an agent in this Reinforcement Learning scenario and I learn as I play the game.")
+        # We love anthropomorphising the computer, don't we?
+        if self.mode == "LEARNING":
+            print(f"Hello, my name is {self.name}. I'm an agent in this Reinforcement mode scenario and I learn as I play the game.")
             print(f"My model has {len(self.model_df)} rows")
-        else:
+            print(f"My model is stored in this location {self.file}.\n")
+        elif self.mode == "NOT_LEARNING":
             print(f"Hello, my name is {self.name}. I used to be an agent. I learned how to play the game across #TODO episodes.")
             print(f"I REFUSE TO LEARN ANYTHING ELSE!")
-        print(f"My model is stored in this location {self.file}.\n")
+            print(f"My model is stored in this location {self.file}.\n")
+        elif self.mode == "RULES":
+            print(f"Hello, my name is {self.name}. I play the game based on a set of simple, fixed rules.")
+
+
+    def make_rules_based_move(self,b,p,tt):
+        pm = get_possible_moves(b)
+        if tt == 0: # This means it's X's first turn
+            m = "00"
+        elif tt == 1: # It's Y's first turn
+            #if (b[0][0] != -1):
+            if "00" in pm:
+                m = "00"
+            elif (b[0][2] != -1):
+                m = "02"
+            elif (b[2][0] != -1):
+                m = "20"
+            elif (b[2][2] != -1):
+                m = "22"
+        if tt >= 4: # Four moves have been played. After this point it's possible to win
+            for m in pm:
+                mr, mc = int(m[0]), int(m[1])
+                spec_b = b[mr][mc]
+                if check_for_winner(spec_b):
+                    break
+        else:
+            m = random.choice(pm)
+            mr, mc = int(m[0]), int(m[1])
+            m = str(m[0]) + str(m[1])
+
+        mr, mc = int(m[0]), int(m[1])
+        b, status, description = make_move_v2(p,b,mr,mc,tt)
+        return b, status, description, m
 
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
@@ -202,6 +236,12 @@ class Player:
 
         b, status, description = make_move_v2(p,b,mr,mc,tt)
         return b, status, description, m
+    
+    def make_agent_move(self,b,tt,p):
+        if self.mode in ["LEARNING", "NOT_LEARNING"]:
+            self.make_model_move(b,tt,p)
+        elif self.mode = "RULES":
+            self.make_rules_based_move(b,p,tt)
     
     def update_model(self):
         actions_states = list(zip(self.actions, self.states))
