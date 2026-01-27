@@ -1,9 +1,10 @@
 import argparse
-from xo_functions import prettify_board, prettify_boards, Player
+from xo_functions import prettify_board, prettify_boards, Player, columns
 from time import sleep
 
 delay = 0.2 #TODO: Should be an argument
 demo_mode = False #TODO: Should be an argument
+print_vertical_only = True
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--file", help = "What file are you using to load or save the model weights?")
@@ -17,10 +18,10 @@ args = parser.parse_args()
 file = args.file
 n = int(args.number_of_episodes)
 reward_win, reward_lose, reward_draw = args.rewards.split("|")
-reward_win, reward_lose, reward_draw = int(reward_win), int(reward_lose), int(reward_draw)
+reward_win, reward_lose, reward_draw = float(reward_win), float(reward_lose), float(reward_draw)
 
 is_p2_learning = False
-p1 = Player("Tom (P1)",file,True)
+p1 = Player("Tom (P1)",file,True, reward_win)
 p2 = Player("Gregg (P2)",file,is_p2_learning)
 p1.greet()
 p2.greet()
@@ -94,23 +95,16 @@ for episode in range(0,n):
             o_wins += 1
             o_player.wins += 1
             winner = o_player.name
-        
+
+
+
         # For now, let's take it that p1 is always the one we want to learn
         if winner == p1.name: #TODO: c'mon man
-            print(f"Here is {p1.name}'s winning game summary.\n")
-            prettify_boards(turn_end_states)
-            for i, reinforce_action in enumerate(p1.actions):
-                # reinforce_action so named to distinguish from actions which aren't necessarily to be reinforced
-                reinforce_state = p1.states[i]
-                before = p1.model_df[p1.model_df["state"] == str(reinforce_state)][reinforce_action]
-                #print("before")
-                #print(before)
-                p1.model_df.loc[p1.model_df['state'] == str(reinforce_state), reinforce_action] += 1.0
-                after = p1.model_df[p1.model_df["state"] == str(reinforce_state)][reinforce_action]
-                #print("after")
-                #print(after)
-            #print(p1.model_df)
-            #p1.model_df.to_csv(file, index = False)
+            # TODO training here
+            #print(f"Here is {p1.name}'s winning game summary.\n")
+            if print_vertical_only is False:
+                prettify_boards(turn_end_states)
+            p1.update_model()
 
     if status == 2:
         print("It was a stalemate")
@@ -133,6 +127,11 @@ else:
 print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
 print("Here is the first few states of the p1 model at the end of training: ")
 print(p1.model_df[0:5])
+print(f"\nUpdating file {file}")
+p1.model_df.to_csv(file, index = False)
+
+print("\nIf 11 is not the highest value here...")
+print(p1.model_df.iloc[0][columns])
 
 if is_p2_learning:
     print("p2 model at end of training: ")

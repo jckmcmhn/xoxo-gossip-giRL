@@ -157,12 +157,13 @@ def prettify_boards(boards):
     print("")
 
 class Player:
-    def __init__(self, name, file, learning):
+    def __init__(self, name, file, learning, reward_win = 0):
         self.name = name
         self.file = file
         self.model_df = pd.read_csv(self.file)
         self.model_df.columns = ["state"] + columns
         self.learning = learning
+        self.reward_win = reward_win
         self.wins = 0
         self.wins_as_x = 0
 
@@ -178,7 +179,7 @@ class Player:
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
         #print(f"Making decision for state: {b}")
-        choice = random.choice([0,1])
+        choice = random.choice([0,0,0,0,0,0,1])
         if (choice == 0): # Need episode to be available here, not tt
             #print("Making a random choice")
             pm = get_possible_moves(b)
@@ -187,7 +188,7 @@ class Player:
             m = str(m[0]) + str(m[1])
         else:
             # Using model choice
-            print("Using the model's preferred choice")
+            #print("Using the model's preferred choice")
             hits = self.model_df[self.model_df["state"] == str(b)][columns]
             hits = hits.transpose()
             hits.columns = ["values"]
@@ -201,3 +202,22 @@ class Player:
 
         b, status, description = make_move_v2(p,b,mr,mc,tt)
         return b, status, description, m
+    
+    def update_model(self):
+        actions_states = list(zip(self.actions, self.states))
+        actions_states.reverse()
+        reward_left = self.reward_win
+        for i, reinforce_action in enumerate(self.actions):
+            # reinforce_action so named to distinguish from actions which aren't necessarily to be reinforced
+            reinforce_state = self.states[i]
+            #before = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
+            #print("before")
+            #print(before)
+            self.model_df.loc[self.model_df['state'] == str(reinforce_state), reinforce_action] += reward_left
+            reward_left -= 1.0
+            print(reward_left)
+            #after = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
+            #print("after")
+            #print(after)
+
+
