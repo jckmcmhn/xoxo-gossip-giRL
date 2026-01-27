@@ -2,7 +2,7 @@ import argparse
 from xo_functions import prettify_board, prettify_boards, Player, columns
 from time import sleep
 
-delay = 0.2 #TODO: Should be an argument
+delay = 0.1 #TODO: Should be an argument
 demo_mode = False #TODO: Should be an argument
 print_vertical_only = True
 
@@ -21,8 +21,10 @@ reward_win, reward_lose, reward_draw = args.rewards.split("|")
 reward_win, reward_lose, reward_draw = float(reward_win), float(reward_lose), float(reward_draw)
 
 is_p2_learning = False
+#p1 = Player("Tom (P1)",file,"LEARNING_DEMO", reward_win)
 p1 = Player("Tom (P1)",file,"LEARNING", reward_win)
-p2 = Player("Gregg (P2)",file,"NOT_LEARNING")
+p2 = Player("Gregg (P2)","blank_q_learning_table.csv","NOT_LEARNING")
+#p2 = Player("Data (P2)",file,"RULES")
 p1.greet()
 p2.greet()
 
@@ -125,13 +127,17 @@ else:
     print(f"\n{p2.name} total wins: 0")
 
 print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
-print("Here is the first few states of the p1 model at the end of training: ")
-print(p1.model_df[0:5])
-print(f"\nUpdating file {file}")
-p1.model_df.to_csv(file, index = False)
 
-print("\nIf 11 is not the highest value here...")
-print(p1.model_df.iloc[0][columns])
+
+
+if (n > 10) and (p1.mode == "LEARNING"):
+    print("\nIf 00, 02, 20 or 22 is not the highest value here, we're in trouble")
+    print(p1.model_df.iloc[0][columns])
+
+    print("Here is the first few states of the p1 model at the end of training: ")
+    print(p1.model_df[0:5])
+    print(f"\nUpdating file {file}")
+    p1.model_df.to_csv(file, index = False)
 
 if is_p2_learning:
     print("p2 model at end of training: ")

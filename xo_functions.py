@@ -1,6 +1,8 @@
 import random
 import numpy as np
 import pandas as pd
+import copy
+from time import sleep
 
 columns = ["00", "01", "02", "10", "11", "12", "20", "21", "22"]
 
@@ -169,24 +171,25 @@ class Player:
 
     def greet(self):
         # We love anthropomorphising the computer, don't we?
-        if self.mode == "LEARNING":
-            print(f"Hello, my name is {self.name}. I'm an agent in this Reinforcement mode scenario and I learn as I play the game.")
+        if self.mode in ["LEARNING", "LEARNING_DEMO"]:
+            print(f"\nHello, my name is {self.name}. I'm an agent in this Reinforcement mode scenario and I learn as I play the game.")
             print(f"My model has {len(self.model_df)} rows")
             print(f"My model is stored in this location {self.file}.\n")
+            if self.mode == "LEARNING_DEMO":
+                print("I save my updated model to disk at the end of every episode for demonstration purposes. This could be quite slow on your computer")
         elif self.mode == "NOT_LEARNING":
-            print(f"Hello, my name is {self.name}. I used to be an agent. I learned how to play the game across #TODO episodes.")
+            print(f"\nHello, my name is {self.name}. I used to be an agent. I learned how to play the game across #TODO episodes.")
             print(f"I REFUSE TO LEARN ANYTHING ELSE!")
             print(f"My model is stored in this location {self.file}.\n")
         elif self.mode == "RULES":
-            print(f"Hello, my name is {self.name}. I play the game based on a set of simple, fixed rules.")
+            print(f"\nHello, my name is {self.name}. I play the game based on a set of simple, fixed rules.")
 
 
-    def make_rules_based_move(self,b,p,tt):
+    def make_rules_based_move(self,b,tt,p):
         pm = get_possible_moves(b)
         if tt == 0: # This means it's X's first turn
             m = "00"
         elif tt == 1: # It's Y's first turn
-            #if (b[0][0] != -1):
             if "00" in pm:
                 m = "00"
             elif (b[0][2] != -1):
@@ -196,9 +199,11 @@ class Player:
             elif (b[2][2] != -1):
                 m = "22"
         if tt >= 4: # Four moves have been played. After this point it's possible to win
+            #print("Do I have a winning move")
             for m in pm:
                 mr, mc = int(m[0]), int(m[1])
-                spec_b = b[mr][mc]
+                spec_b = copy.deepcopy(b)
+                spec_b[mr][mc] = p
                 if check_for_winner(spec_b):
                     break
         else:
@@ -221,14 +226,11 @@ class Player:
             mr, mc = int(m[0]), int(m[1])
             m = str(m[0]) + str(m[1])
         else:
-            # Using model choice
-            #print("Using the model's preferred choice")
             hits = self.model_df[self.model_df["state"] == str(b)][columns]
             hits = hits.transpose()
             hits.columns = ["values"]
             hits = hits.reset_index()
             max_value = np.nanmax(hits["values"]) # seems bizzare to have to do this, but if the first value is nan then regular max screws up
-            #print(f"max value {max_value}")
             top_answers = hits[hits["values"] == max_value]
             m = str(random.choice(list(top_answers["index"])))
             mr, mc = int(m[0]), int(m[1])
@@ -238,10 +240,10 @@ class Player:
         return b, status, description, m
     
     def make_agent_move(self,b,tt,p):
-        if self.mode in ["LEARNING", "NOT_LEARNING"]:
-            self.make_model_move(b,tt,p)
-        elif self.mode = "RULES":
-            self.make_rules_based_move(b,p,tt)
+        if self.mode in ["LEARNING", "LEARNING_DEMO", "NOT_LEARNING"]:
+            return self.make_model_move(b,tt,p)
+        elif self.mode == "RULES":
+            return self.make_rules_based_move(b,tt,p)
     
     def update_model(self):
         actions_states = list(zip(self.actions, self.states))
@@ -255,9 +257,12 @@ class Player:
             #print(before)
             self.model_df.loc[self.model_df['state'] == str(reinforce_state), reinforce_action] += reward_left
             reward_left -= 1.0
-            print(reward_left)
             #after = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
             #print("after")
             #print(after)
+            if self.mode == "LEARNING_DEMO":
+                self.model_df.to_csv(self.file, index = False) # This will be a bit slow, but will make a cool visual
+                # if you can watch the csv update in real time
+                sleep(0.2) # Have to give your PC time to read the new file
 
 
