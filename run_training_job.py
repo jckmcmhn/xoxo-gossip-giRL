@@ -2,7 +2,7 @@ import argparse
 from xo_functions import prettify_board, prettify_boards, Player, columns
 from time import sleep
 
-delay = 0.2 #TODO: Should be an argument
+delay = 0.1 #TODO: Should be an argument
 demo_mode = False #TODO: Should be an argument
 print_vertical_only = True
 
@@ -21,8 +21,8 @@ reward_win, reward_lose, reward_draw = args.rewards.split("|")
 reward_win, reward_lose, reward_draw = float(reward_win), float(reward_lose), float(reward_draw)
 
 is_p2_learning = False
-p1 = Player("Tom (P1)",file,True, reward_win)
-p2 = Player("Gregg (P2)",file,is_p2_learning)
+p1 = Player("Tom (P1)",file,"LEARNING", reward_win)
+p2 = Player("Al (P2)",file,"RULES_IMPERFECT")
 p1.greet()
 p2.greet()
 
@@ -52,7 +52,7 @@ for episode in range(0,n):
         x_player.states.append(str(b)) # HAS TO BE A STRING, 
         x_player_b.append(b)
         x_turn = True
-        b, status, description, m = x_player.make_model_move(b,tt,-1)
+        b, status, description, m = x_player.make_agent_move(b,tt,-1)
         tt += 1
         x_player_m.append(m)
         x_player.actions.append(m)
@@ -66,7 +66,7 @@ for episode in range(0,n):
             o_player.states.append(str(b))
             o_player_b.append(b)
             x_turn = False
-            b, status, description, m = o_player.make_model_move(b,tt,1)
+            b, status, description, m = o_player.make_agent_move(b,tt,1)
             tt += 1
             o_player_m.append(m)
             o_player.actions.append(m)
@@ -96,8 +96,6 @@ for episode in range(0,n):
             o_player.wins += 1
             winner = o_player.name
 
-
-
         # For now, let's take it that p1 is always the one we want to learn
         if winner == p1.name: #TODO: c'mon man
             # TODO training here
@@ -125,13 +123,17 @@ else:
     print(f"\n{p2.name} total wins: 0")
 
 print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
-print("Here is the first few states of the p1 model at the end of training: ")
-print(p1.model_df[0:5])
-print(f"\nUpdating file {file}")
-p1.model_df.to_csv(file, index = False)
 
-print("\nIf 11 is not the highest value here...")
-print(p1.model_df.iloc[0][columns])
+
+
+if (n > 10) and (p1.mode == "LEARNING"):
+    print("\nIf 00, 02, 20 or 22 is not the highest value here, we're in trouble")
+    print(p1.model_df.iloc[0][columns])
+
+    print("Here is the first few states of the p1 model at the end of training: ")
+    print(p1.model_df[0:5])
+    print(f"\nUpdating file {file}")
+    p1.model_df.to_csv(file, index = False)
 
 if is_p2_learning:
     print("p2 model at end of training: ")
