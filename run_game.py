@@ -34,24 +34,27 @@ print("""
 
 
 if p == -1:
+    turns_taken = 0
     print("You are going first")
     m = input("Input your move: ")
     if m == "q":
         exit()
-    b, status = make_player_move(p,b,m)
+    b, status = make_player_move(p,b,m,turns_taken)
+    turns_taken += 1
     print("The Computer is making its first move")
-    b, status = make_computer_move(c,b)
-    turns_taken = 2
+    b, status = make_computer_move(c,b,turns_taken)
+    turns_taken += 1
 
 if p == 1:
+    turns_taken = 0
     print("The Computer is going first")
-    b, status = make_computer_move(-1,b)
+    b, status = make_computer_move(-1,b,turns_taken)
     turns_taken = 1
 
 status = False
 winner = 0
 
-while turns_taken != 9 and status is False:
+while turns_taken != 9 and status == 0:
     print(f"Your move. Here is the board. You are {p_name} and The Computer is {c_name}")
 
     prettify_board(b)
@@ -62,22 +65,23 @@ while turns_taken != 9 and status is False:
             m = input("Input your move: ")
             if m == "q":
                 exit()
-            b, status = make_player_move(p,b,m)
+            b, status = make_player_move(p,b,m,turns_taken)
             turns_taken += 1
             valid_move = True
+            print("That's a valid move")
             if status == True:
                 print("\nCongrats! You Won!")
                 winner = p
         except ValueError:
             print("An error occurred, try again")
-    if turns_taken != 9 and status is False:
-        b, status = make_computer_move(c,b)
+    if turns_taken != 9 and status == 0:
+        b, status = make_computer_move(c,b,turns_taken)
         turns_taken += 1
         if status == True:
             print("\nOh no! The Computer won :(")
             winner = c
 
-if status is False:
+if status == 0:
     print("It was a stalemate")
 print("\nHere's the final board:")
 prettify_board(b)
