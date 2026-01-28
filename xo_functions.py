@@ -257,11 +257,9 @@ class Player:
             # reinforce_action so named to distinguish from actions which aren't necessarily to be reinforced
             reinforce_state = self.states[i]
             #before = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
-            #print(before)
             self.model_df.loc[self.model_df['state'] == str(reinforce_state), reinforce_action] += reward_left
             reward_left -= 1.0
             #after = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
-            #print(after)
             if self.mode == "LEARNING_DEMO":
                 self.model_df.to_csv(self.file, index = False) # This will be a bit slow, but will make a cool visual
                 # if you can watch the csv update in real time
