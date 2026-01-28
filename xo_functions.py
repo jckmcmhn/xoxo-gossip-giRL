@@ -215,12 +215,15 @@ class Player:
         mr, mc = int(m[0]), int(m[1])
         b, status, description = make_move_v2(p,b,mr,mc,tt)
         return b, status, description, m
+    
+    def use_learning_table(epsilon):
+        return 1 == random.choice([1,0,0,0,0,0])
 
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
         #print(f"Making decision for state: {b}")
-        choice = random.choice([1])
-        if (choice == 0): # Need episode to be available here, not tt
+        choice = what_model_to_use(0) # TODO: Define this function properly
+        if choice: # Need episode to be available here, not tt
             #print("Making a random choice")
             pm = get_possible_moves(b)
             m = random.choice(pm)
