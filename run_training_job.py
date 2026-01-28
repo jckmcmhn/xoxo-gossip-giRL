@@ -22,9 +22,10 @@ reward_win, reward_lose, reward_draw = float(reward_win), float(reward_lose), fl
 
 is_p2_learning = False
 #p1 = Player("Tom (P1)",file,"LEARNING_DEMO", reward_win)
-p1 = Player("Tom (P1)",file,"LEARNING", reward_win)
-p2 = Player("Gregg (P2)","blank_q_learning_table.csv","NOT_LEARNING")
-#p2 = Player("Data (P2)",file,"RULES")
+#p1 = Player("Tom (P1)",file,"LEARNING", reward_win)
+p1 = Player("Tom (P1)",file,"NOT_LEARNING", reward_win) # Static trained model
+#p2 = Player("Gregg (P2)","blank_q_learning_table.csv","NOT_LEARNING")
+p2 = Player("Al (P2)",file,"RULES_IMPERFECT")
 p1.greet()
 p2.greet()
 

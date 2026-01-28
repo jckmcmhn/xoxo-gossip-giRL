@@ -171,18 +171,22 @@ class Player:
 
     def greet(self):
         # We love anthropomorphising the computer, don't we?
+        if self.name.startswith("Al"):
+            print("\bYou can call me Al")
+        else:
+            print(f"\nHello, my name is {self.name}.")
         if self.mode in ["LEARNING", "LEARNING_DEMO"]:
-            print(f"\nHello, my name is {self.name}. I'm an agent in this Reinforcement mode scenario and I learn as I play the game.")
+            print(f"I'm an agent in this Reinforcement mode scenario and I learn as I play the game.")
             print(f"My model has {len(self.model_df)} rows")
             print(f"My model is stored in this location {self.file}.\n")
             if self.mode == "LEARNING_DEMO":
                 print("I save my updated model to disk at the end of every episode for demonstration purposes. This could be quite slow on your computer")
         elif self.mode == "NOT_LEARNING":
-            print(f"\nHello, my name is {self.name}. I used to be an agent. I learned how to play the game across #TODO episodes.")
+            print(f"I used to be an agent. I learned how to play the game across #TODO episodes.")
             print(f"I REFUSE TO LEARN ANYTHING ELSE!")
             print(f"My model is stored in this location {self.file}.\n")
-        elif self.mode == "RULES":
-            print(f"\nHello, my name is {self.name}. I play the game based on a set of simple, fixed rules.")
+        elif self.mode == "RULES_IMPERFECT":
+            print(f"I play the game based on a set of simple, fixed rules. My algorithm is 'imperfect'—that is, it won't make 'perfect' moves every time.") # It uses an em-dash because it's technically ai, do you get it? Well? Do you?
 
 
     def make_rules_based_move(self,b,tt,p):
@@ -190,16 +194,13 @@ class Player:
         if tt == 0: # This means it's X's first turn
             m = "00"
         elif tt == 1: # It's Y's first turn
-            if "00" in pm:
+            # This isn't quite right, it should be if X took a corner, take the middle, if X took the middle take a corner, if X took an "edge" (the points on a plus sign) TBD
+            if b == [[0,0,0],[0,-1,0],[0,0,0]]: # if X took the middle
                 m = "00"
-            elif (b[0][2] != -1):
-                m = "02"
-            elif (b[2][0] != -1):
-                m = "20"
-            elif (b[2][2] != -1):
-                m = "22"
-        if tt >= 4: # Four moves have been played. After this point it's possible to win
-            #print("Do I have a winning move")
+            elif b in [[[-1,0,0],[0,0,0],[0,0,0]], [[0,0,-1],[0,0,0],[0,0,0]], [[0,0,0],[0,0,0],[-1,0,0]], [[0,0,0],[0,0,0],[0,0,-1]]]: # X took a corner
+                m = "11"
+
+        elif tt >= 4: # Four moves have been played. After this point it's possible to win
             for m in pm:
                 mr, mc = int(m[0]), int(m[1])
                 spec_b = copy.deepcopy(b)
@@ -218,7 +219,7 @@ class Player:
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
         #print(f"Making decision for state: {b}")
-        choice = random.choice([0,0,0,0,0,0,1])
+        choice = random.choice([1])
         if (choice == 0): # Need episode to be available here, not tt
             #print("Making a random choice")
             pm = get_possible_moves(b)
@@ -242,7 +243,7 @@ class Player:
     def make_agent_move(self,b,tt,p):
         if self.mode in ["LEARNING", "LEARNING_DEMO", "NOT_LEARNING"]:
             return self.make_model_move(b,tt,p)
-        elif self.mode == "RULES":
+        elif self.mode == "RULES_IMPERFECT":
             return self.make_rules_based_move(b,tt,p)
     
     def update_model(self):
@@ -253,12 +254,10 @@ class Player:
             # reinforce_action so named to distinguish from actions which aren't necessarily to be reinforced
             reinforce_state = self.states[i]
             #before = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
-            #print("before")
             #print(before)
             self.model_df.loc[self.model_df['state'] == str(reinforce_state), reinforce_action] += reward_left
             reward_left -= 1.0
             #after = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
-            #print("after")
             #print(after)
             if self.mode == "LEARNING_DEMO":
                 self.model_df.to_csv(self.file, index = False) # This will be a bit slow, but will make a cool visual
