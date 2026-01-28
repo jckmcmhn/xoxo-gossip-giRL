@@ -1,4 +1,16 @@
-from xo_functions import make_player_move, make_computer_move, prettify_board
+from xo_functions import make_player_move, make_computer_move, prettify_board, Player
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-o", "--opponent", help = "what model to play against")
+args = parser.parse_args()
+opponent = args.opponent
+
+if opponent == "rl":
+    p2 = Player("Gregg","q_learning_table.csv","NOT_LEARNING") # Static trained model
+else:
+    p2 = Player("Gregg (P2)","blank_q_learning_table.csv","NOT_LEARNING")
+
 
 b = [[0,0,0],[0,0,0],[0,0,0]]
 
@@ -39,16 +51,19 @@ if p == -1:
     m = input("Input your move: ")
     if m == "q":
         exit()
+
     b, status = make_player_move(p,b,m,turns_taken)
     turns_taken += 1
     print("The Computer is making its first move")
-    b, status = make_computer_move(c,b,turns_taken)
+    b, status, description, m = p2.make_agent_move(b,turns_taken,1)
+    #b, status = make_computer_move(c,b,turns_taken)
     turns_taken += 1
 
 if p == 1:
     turns_taken = 0
     print("The Computer is going first")
-    b, status = make_computer_move(-1,b,turns_taken)
+    #b, status = make_computer_move(-1,b,turns_taken)
+    b, status, description, m = p2.make_agent_move(b,turns_taken,-1)
     turns_taken = 1
 
 status = False
@@ -75,7 +90,8 @@ while turns_taken != 9 and status == 0:
         except ValueError:
             print("An error occurred, try again")
     if turns_taken != 9 and status == 0:
-        b, status = make_computer_move(c,b,turns_taken)
+        b, status, description, m = p2.make_agent_move(b,turns_taken,c)
+        #b, status = make_computer_move(c,b,turns_taken)
         turns_taken += 1
         if status == True:
             print("\nOh no! The Computer won :(")
