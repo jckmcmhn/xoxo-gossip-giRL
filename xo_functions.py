@@ -159,16 +159,6 @@ def prettify_boards(boards):
     print("")
 
 class Player:
-    def __init__(self, name, file, mode, reward_win = 0):
-        self.name = name
-        self.file = file
-        self.model_df = pd.read_csv(self.file)
-        self.model_df.columns = ["state"] + columns
-        self.mode = mode
-        self.reward_win = reward_win
-        self.wins = 0
-        self.wins_as_x = 0
-
     def greet(self):
         # We love anthropomorphising the computer, don't we?
         if self.name.startswith("Al"):
@@ -188,6 +178,16 @@ class Player:
         elif self.mode == "RULES_IMPERFECT":
             print(f"I play the game based on a set of simple, fixed rules. My algorithm is 'imperfect'—that is, it won't make 'perfect' moves every time.") # It uses an em-dash because it's technically ai, do you get it? Well? Do you?
 
+    def __init__(self, name, file, mode, reward_win = 0):
+        self.name = name
+        self.file = file
+        self.model_df = pd.read_csv(self.file)
+        self.model_df.columns = ["state"] + columns
+        self.mode = mode
+        self.reward_win = reward_win
+        self.wins = 0
+        self.wins_as_x = 0
+        self.greet()
 
     def make_rules_based_move(self,b,tt,p):
         pm = get_possible_moves(b)
