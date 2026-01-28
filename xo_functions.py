@@ -191,6 +191,8 @@ class Player:
 
     def make_rules_based_move(self,b,tt,p):
         pm = get_possible_moves(b)
+        m = random.choice(pm)
+        m = str(m[0]) + str(m[1])
         if tt == 0: # This means it's X's first turn
             m = "00"
         elif tt == 1: # It's Y's first turn
@@ -201,28 +203,26 @@ class Player:
                 m = "11"
 
         elif tt >= 4: # Four moves have been played. After this point it's possible to win
-            for m in pm:
-                mr, mc = int(m[0]), int(m[1])
+            for m4 in pm: # Don't overwrite the default m from the top of the function
+                mr, mc = m4[0], m4[1]
                 spec_b = copy.deepcopy(b)
                 spec_b[mr][mc] = p
                 if check_for_winner(spec_b):
+                    m = str(m[0]) + str(m[1])
                     break
-        else:
-            m = random.choice(pm)
-            mr, mc = int(m[0]), int(m[1])
-            m = str(m[0]) + str(m[1])
+
 
         mr, mc = int(m[0]), int(m[1])
         b, status, description = make_move_v2(p,b,mr,mc,tt)
         return b, status, description, m
     
-    def use_learning_table(epsilon):
+    def use_learning_table(self,epsilon):
         return 1 == random.choice([1,0,0,0,0,0])
 
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
         #print(f"Making decision for state: {b}")
-        choice = what_model_to_use(0) # TODO: Define this function properly
+        choice = self.use_learning_table(0) # TODO: Define this function properly
         if choice: # Need episode to be available here, not tt
             #print("Making a random choice")
             pm = get_possible_moves(b)
