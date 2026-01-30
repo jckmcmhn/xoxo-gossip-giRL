@@ -30,6 +30,7 @@
     - compare this performance to the model which is rewarded for winning or stalemates
 - second baseline: computer player that has some pre-written rules but otherwise chooses at random
     - ~~if you have a winning move, always take it~~
+    - if there is a space beside one of your markers and also space beside that, take that
 - look into setting up a linter to tidy the code
 - ~~apparently the accepted naming convention for git repos uses hyphens~~
 - can probably predict stalemates a turn or two before they happen, but let's not get ahead of ourselves
