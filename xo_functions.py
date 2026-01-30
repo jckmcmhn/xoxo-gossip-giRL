@@ -224,6 +224,8 @@ class Player:
                 return self.make_rules_based_move(b,tt,p)
             else:
                 return self.make_rules_based_move(b,tt,p,False)
+        else:
+            raise ValueError(f"Mode {self.mode} not recognised")
     
     def update_model(self, status, tt):
         actions_states = list(zip(self.actions, self.states))

@@ -7,9 +7,9 @@ args = parser.parse_args()
 opponent = args.opponent
 
 if opponent == "rl":
-    p2 = Player("Gregg","q_learning_table.csv","NOT_LEARNING") # Static trained model
+    p2 = Player("Gregg","q_learning_table.csv","FIXED") # Static trained model
 else:
-    p2 = Player("Gregg (P2)","blank_q_learning_table.csv","NOT_LEARNING")
+    p2 = Player("Gregg (P2)","blank_q_learning_table.csv","FIXED")
 
 
 b = [[0,0,0],[0,0,0],[0,0,0]]
