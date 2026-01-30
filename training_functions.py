@@ -27,7 +27,7 @@ def update_player_objects(player, status, tt, log_level = 1):
     return player #todo, is this necessary?
 
 
-def run_training_loop(p1, p2, n, epsilon, alternate_x = "ALTERNATE", log_level = 3):
+def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
     # log levels: 0 = None, 1 = Minimal, 3 = Normal, 4 = ? 5 = Maximum
 
     delay = 0.1 #TODO: Should be an argument and parameter
@@ -123,9 +123,9 @@ def run_training_loop(p1, p2, n, epsilon, alternate_x = "ALTERNATE", log_level =
             prettify_board(b)
             sleep(delay * 1.5)
 
-    print(f"\nX wins: {x_wins}")
-    print(f"O wins: {o_wins}")
-    print(f"Draws: {draws}")
+    print(f"\nX wins: {x_wins} ({round(100 * x_wins / n, 2)}%)")
+    print(f"O wins: {o_wins} ({round(100 * o_wins / n, 2)}%)")
+    print(f"Draws: {draws} ({round(100 * draws / n, 2)}%)")
     if p1.wins != 0:
         print(f"\n{p1.name} total wins: {p1.wins}. Of those, {p1.wins_as_x} ({round(100 * p1.wins_as_x / p1.wins, 2)}%) were as X.")
         print(f"For games where {p1.name} won, the average number of turns taken in winning games was {statistics.mean(p1.tt_wins)}, the max was {max(p1.tt_wins)} and the min was {min(p1.tt_wins)}")
