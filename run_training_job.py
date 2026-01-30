@@ -34,4 +34,4 @@ p1 = Player("Tom (P1)",file,"FIXED")
 p2 = Player("Gregg (P2)","blank_q_learning_table.csv","FIXED")
 run_training_loop(p1, p2, int(n / 10), "ALTERNATE", 0)
 
-print(f"For this experiment, epsilon was {epsilon}, the win reward was {reward_win}, the loss reward was {reward_lose} and the draw reward was {reward_draw}")
+print(f"For this experiment, there were {n} training episodes and {int(n / 10)} validation episodes, epsilon was {epsilon}, the win reward was {reward_win}, the loss reward was {reward_lose} and the draw reward was {reward_draw}")
