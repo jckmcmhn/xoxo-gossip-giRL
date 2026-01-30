@@ -111,8 +111,8 @@ def run_training_loop(p1, p2, n, epsilon, alternate_x = "YES", log_level = "NORM
         print(f"{p2.name} total wins: {p2.wins}. Of those, {p2.wins_as_x} ({round(100 * p2.wins_as_x / p2.wins, 2)}%) were as X.")
     else:
         print(f"\n{p2.name} total wins: 0")
-
-    print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
+    if p2.wins != 0:
+        print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
 
 
 
