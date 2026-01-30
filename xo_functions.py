@@ -132,8 +132,10 @@ class Player:
             print(f"I used to be an agent. I learned how to play the game across #TODO episodes.")
             print(f"I REFUSE TO LEARN ANYTHING ELSE!")
             print(f"My model is stored in this location {self.file}.\n")
-        elif self.mode == "RULES_IMPERFECT":
+        elif self.mode.startswith("RULES_IMPERFECT"):
             print(f"I play the game based on a set of simple, fixed rules. My algorithm is 'imperfect'—that is, it won't make 'perfect' moves every time.") # It uses an em-dash because it's technically ai, do you get it? Well? Do you?
+            if self.mode.endswith("NOT_LOCKED_IN"):
+                print("That said, I'm not really paying attention.")
 
     def __init__(self, name, file, mode, reward_win = 0):
         self.name = name
@@ -146,21 +148,19 @@ class Player:
         self.wins_as_x = 0
         self.greet()
 
-    def make_rules_based_move(self,b,tt,p):
+    def make_rules_based_move(self,b,tt,p,locked_in = True):
+        # A player that isn't locked in will still always take winning moves, but any moves taken before that may be at random
+        # This is to try and simulate a human player who knows how the game works but isn't really paying attention. Maybe they're on their phone?
         pm = get_possible_moves(b)
-        m = random.choice(pm)
+        m = random.choice(pm) # This is the default move. The following if clause will determine if this gets updated
         m = str(m[0]) + str(m[1])
-        if tt == 0: # This means it's X's first turn
-            m = "00"
-        elif tt == 1: # It's Y's first turn
-            # This isn't quite right, it should be if X took a corner, take the middle, if X took the middle take a corner, if X took an "edge" (the points on a plus sign) TBD
-            if b == [[0,0,0],[0,-1,0],[0,0,0]]: # if X took the middle
-                m = "00"
-            elif b in [[[-1,0,0],[0,0,0],[0,0,0]], [[0,0,-1],[0,0,0],[0,0,0]], [[0,0,0],[0,0,0],[-1,0,0]], [[0,0,0],[0,0,0],[0,0,-1]]]: # X took a corner
-                m = "11"
-
-        elif tt >= 4: # Four moves have been played. After this point it's possible to win
-            for m4 in pm: # Don't overwrite the default m from the top of the function
+        if not locked_in:
+            looking_at_phone = random.choice([True, False])
+        else:
+            looking_at_phone = False
+        if tt >= 4: # Four moves have been played. After this point it's possible to win
+            # The model does this regardless of whether it's locked in
+            for m4 in pm: # Don't overwrite the default m from the top of the function yet
                 mr, mc = m4[0], m4[1]
                 spec_b = copy.deepcopy(b)
                 spec_b[mr][mc] = p
@@ -168,8 +168,16 @@ class Player:
                 if status:
                     m = str(m[0]) + str(m[1])
                     break
-
-
+        if not looking_at_phone:
+            if tt == 0: # This means it's X's first turn
+                m = "00"
+            elif tt == 1: # It's Y's first turn
+            # This isn't quite right, it should be if X took a corner, take the middle, if X took the middle take a corner, if X took an "edge" (the points on a plus sign) TBD
+                if b == [[0,0,0],[0,-1,0],[0,0,0]]: # if X took the middle
+                    m = "00"
+                elif b in [[[-1,0,0],[0,0,0],[0,0,0]], [[0,0,-1],[0,0,0],[0,0,0]], [[0,0,0],[0,0,0],[-1,0,0]], [[0,0,0],[0,0,0],[0,0,-1]]]: # X took a corner
+                    m = "11"
+     
         mr, mc = int(m[0]), int(m[1])
         b, status, description = make_move(p,b,mr,mc,tt)
         return b, status, description, m
@@ -204,8 +212,11 @@ class Player:
     def make_agent_move(self,b,tt,p):
         if self.mode in ["LEARNING", "LEARNING_DEMO", "NOT_LEARNING"]:
             return self.make_model_move(b,tt,p)
-        elif self.mode == "RULES_IMPERFECT":
-            return self.make_rules_based_move(b,tt,p)
+        elif self.mode.startswith("RULES_IMPERFECT"):
+            if self.mode.endswith("NOT_LOCKED_IN"):
+                return self.make_rules_based_move(b,tt,p)
+            else:
+                return self.make_rules_based_move(b,tt,p,False)
     
     def update_model(self):
         actions_states = list(zip(self.actions, self.states))
