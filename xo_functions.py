@@ -135,7 +135,7 @@ class Player:
             if self.mode.endswith("NOT_LOCKED_IN"):
                 print("That said, I'm not really paying attention.")
 
-    def __init__(self, name, file, mode, rewards = [0,0,0]):
+    def __init__(self, name, file, mode, epsilon = 70, rewards = [0,0,0]):
         self.name = name
         self.file = file
         self.model_df = pd.read_csv(self.file)
@@ -144,6 +144,7 @@ class Player:
         self.reward_win = rewards[0]
         self.reward_lose = rewards[1]
         self.reward_draw = rewards[2]
+        self.epsilon = epsilon # 70
 
         # The following attributes accumulate over multiple episodes, so it makes sense to set them at player init
         self.wins = 0
@@ -189,13 +190,22 @@ class Player:
         b, status, description = make_move(p,b,mr,mc,tt)
         return b, status, description, m
     
-    def use_learning_table(self,epsilon):
-        return 1 == random.choice([1,0,0,0,0,0])
+    def use_learning_table(self):
+        """
+        if self.mode.startswith("L"):
+            check = random.randint(0,100)
+            print(self.epsilon)
+            if check <= self.epsilon:
+                print("would use model here")
+        else:
+            return 1 == random.choice([1,0,0,0,0,0])
+        """
+        return 1 == random.choice([1,0,0,0,0,0]) # FOR TESTING
 
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
         #print(f"Making decision for state: {b}")
-        choice = self.use_learning_table(0) # TODO: Define this function properly
+        choice = self.use_learning_table() # TODO: Define this function properly
         if choice: # Need episode to be available here, not tt
             #print("Making a random choice")
             pm = get_possible_moves(b)
@@ -214,6 +224,7 @@ class Player:
             #print(f"{self.name}'s move is {m}")
 
         b, status, description = make_move(p,b,mr,mc,tt)
+        self.epsilon -= 0.001
         return b, status, description, m
     
     def make_agent_move(self,b,tt,p):
@@ -245,4 +256,5 @@ class Player:
                 break
             if (not positive_reinforcement) & (reward_left >= 0):
                 break
+
 

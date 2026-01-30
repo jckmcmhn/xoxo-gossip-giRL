@@ -27,7 +27,7 @@ def update_player_objects(player, status, tt, log_level = 1):
     return player #todo, is this necessary?
 
 
-def run_training_loop(p1, p2, n, epsilon, alternate_x = "ALTERNATE", log_level = 3):
+def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
     # log levels: 0 = None, 1 = Minimal, 3 = Normal, 4 = ? 5 = Maximum
 
     delay = 0.1 #TODO: Should be an argument and parameter
