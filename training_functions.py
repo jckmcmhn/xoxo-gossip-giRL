@@ -128,11 +128,13 @@ def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
     print(f"Draws: {draws} ({round(100 * draws / n, 2)}%)")
     if p1.wins != 0:
         print(f"\n{p1.name} total wins: {p1.wins}. Of those, {p1.wins_as_x} ({round(100 * p1.wins_as_x / p1.wins, 2)}%) were as X.")
+        print(f"{p1.name} total losses: {n - p1.wins - draws}.")
         print(f"For games where {p1.name} won, the average number of turns taken in winning games was {statistics.mean(p1.tt_wins)}, the max was {max(p1.tt_wins)} and the min was {min(p1.tt_wins)}")
     else:
         print(f"\n{p1.name} total wins: 0")
     if p2.wins != 0:
         print(f"\n{p2.name} total wins: {p2.wins}. Of those, {p2.wins_as_x} ({round(100 * p2.wins_as_x / p2.wins, 2)}%) were as X.")
+        print(f"{p2.name} total losses: {n - p2.wins - draws}.")
         print(f"For games where {p2.name} won, the average number of turns taken in winning games was {statistics.mean(p2.tt_wins)}, the max was {max(p2.tt_wins)} and the min was {min(p2.tt_wins)}")
     else:
         print(f"\n{p2.name} total wins: 0")
