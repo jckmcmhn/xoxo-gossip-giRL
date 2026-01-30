@@ -33,8 +33,7 @@ def check_for_winner(b, tt):
         return 1, "d2"
     else:
         if tt == 8: #See TODO above
-            print("STALEMATE")
-            return 2, "s" # Stalemate
+            return 2, "s" # draw
         else:
             return 0, ""
     
@@ -122,30 +121,38 @@ class Player:
             print("\bYou can call me Al")
         else:
             print(f"\nHello, my name is {self.name}.")
-        if self.mode in ["LEARNING", "LEARNING_DEMO"]:
+        if self.mode.startswith("LEARNING"):
             print(f"I'm an agent in this Reinforcement mode scenario and I learn as I play the game.")
-            print(f"My model has {len(self.model_df)} rows")
-            print(f"My model is stored in this location {self.file}.\n")
+            
             if self.mode == "LEARNING_DEMO":
                 print("I save my updated model to disk at the end of every episode for demonstration purposes. This could be quite slow on your computer")
-        elif self.mode == "NOT_LEARNING":
+        elif self.mode == "FIXED":
             print(f"I used to be an agent. I learned how to play the game across #TODO episodes.")
             print(f"I REFUSE TO LEARN ANYTHING ELSE!")
-            print(f"My model is stored in this location {self.file}.\n")
+            print(f"My model is stored in this location: {self.file} and has {len(self.model_df)} rows.\n")
         elif self.mode.startswith("RULES_IMPERFECT"):
             print(f"I play the game based on a set of simple, fixed rules. My algorithm is 'imperfect'—that is, it won't make 'perfect' moves every time.") # It uses an em-dash because it's technically ai, do you get it? Well? Do you?
             if self.mode.endswith("NOT_LOCKED_IN"):
                 print("That said, I'm not really paying attention.")
 
-    def __init__(self, name, file, mode, reward_win = 0):
+    def __init__(self, name, file, mode, rewards = [0,0,0]):
         self.name = name
         self.file = file
         self.model_df = pd.read_csv(self.file)
         self.model_df.columns = ["state"] + columns
         self.mode = mode
-        self.reward_win = reward_win
+        self.reward_win = rewards[0]
+        self.reward_lose = rewards[1]
+        self.reward_draw = rewards[2]
+
+        # The following attributes accumulate over multiple episodes, so it makes sense to set them at player init
         self.wins = 0
         self.wins_as_x = 0
+        self.wins_as_o = 0
+        self.tt_wins = []
+        self.draws = 0
+        self.draws_as_x = 0
+        self.draws_as_o = 0
         self.greet()
 
     def make_rules_based_move(self,b,tt,p,locked_in = True):
@@ -210,7 +217,7 @@ class Player:
         return b, status, description, m
     
     def make_agent_move(self,b,tt,p):
-        if self.mode in ["LEARNING", "LEARNING_DEMO", "NOT_LEARNING"]:
+        if self.mode in ["LEARNING", "LEARNING_DEMO", "FIXED"]:
             return self.make_model_move(b,tt,p)
         elif self.mode.startswith("RULES_IMPERFECT"):
             if self.mode.endswith("NOT_LOCKED_IN"):
@@ -218,20 +225,24 @@ class Player:
             else:
                 return self.make_rules_based_move(b,tt,p,False)
     
-    def update_model(self):
+    def update_model(self, status, tt):
         actions_states = list(zip(self.actions, self.states))
         actions_states.reverse()
-        reward_left = self.reward_win
+        reward_left = [self.reward_lose, self.reward_win, self.reward_draw][status]
+        positive_reinforcement = reward_left > 0
+
         for i, reinforce_action in enumerate(self.actions):
             # reinforce_action so named to distinguish from actions which aren't necessarily to be reinforced
             reinforce_state = self.states[i]
             #before = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
             self.model_df.loc[self.model_df['state'] == str(reinforce_state), reinforce_action] += reward_left
-            reward_left -= 1.0
             #after = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
             if self.mode == "LEARNING_DEMO":
                 self.model_df.to_csv(self.file, index = False) # This will be a bit slow, but will make a cool visual
                 # if you can watch the csv update in real time
                 sleep(0.2) # Have to give your PC time to read the new file
-
+            if positive_reinforcement & (reward_left <= 0):
+                break
+            if (not positive_reinforcement) & (reward_left >= 0):
+                break
 
