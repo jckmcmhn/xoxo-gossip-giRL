@@ -21,7 +21,7 @@
 
 ## Nice-To-Haves
 - rename "status" to something more descriptive
-- change board to state where possible
+- switch to more reinforcement learning standard terminology where applicable: board to state, move to action and (I think) model to policy
 - check_for_winner should highlight what type of victory it was
     - maybe make a separate version for the training process that doesn't do this
     - prettify_board should display the winning line somehow also
