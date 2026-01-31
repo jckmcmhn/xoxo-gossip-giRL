@@ -94,20 +94,22 @@ def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
                     sleep(delay * 0.5)
                 #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
                 turn_end_states.append(str(b))
-        if status == 1:
-            if x_turn:
+        if status == 1: # someone won
+            if x_turn: # X won
                 if log_level != 0:
                     print(f"This game is over. X won.\n")
                 winning_player = x_player
                 x_wins += 1
-                x_player = update_player_objects(x_player, status, tt, log_level)
-            else:
+                x_player = update_player_objects(x_player, 1, tt, log_level) # tell X that they won
+                o_player = update_player_objects(x_player, 0, tt, log_level) # tell O that they lost
+            else: # O won
                 if log_level != 0:
                     print(f"This game is over. O won.\n")
                 winning_player = o_player
                 o_wins += 1
-                o_player = update_player_objects(o_player, status, tt, log_level)
-        if status == 2:
+                o_player = update_player_objects(o_player, 1, tt, log_level) # Tell O they won
+                x_player = update_player_objects(x_player, 0, tt, log_level) # Tell X they lost
+        if status == 2: # Draw
             if log_level != 0:
                 print("It was a draw")
             draws += 1
