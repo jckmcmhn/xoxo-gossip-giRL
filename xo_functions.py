@@ -164,6 +164,11 @@ class Player:
         self.draws = 0
         self.draws_as_x = 0
         self.draws_as_o = 0
+    
+    def sign_off(self):
+        if self.mode.startswith("L"):
+            print(f"For {self.name} the final epsilon value was {self.epsilon}")
+
 
     def make_rules_based_move(self,b,tt,p,locked_in = True):
         # A player that isn't locked in will still always take winning moves, but any moves taken before that may be at random
@@ -201,27 +206,35 @@ class Player:
     
     def use_learning_table(self):
         """
-        if self.mode.startswith("L"):
-            check = random.randint(0,100)
-            print(self.epsilon)
-            if check <= self.epsilon:
-                print("would use model here")
-        else:
-            return 1 == random.choice([1,0,0,0,0,0])
+        Docstring for use_learning_table
+        
+        With probability epsilon, the program choses an action at random
+        With probability 1 - epsilon the program choses an action according to the highest value
+        Lower epsilon = more likely to use model suggestions
+        Epsilon gradually decreases over the course of training
+
+        returning True here means "use model"
+        returning False here means "random choice"
         """
-        return 1 == random.choice([1,0,0,0,0,0]) # FOR TESTING
+
+        if self.mode.startswith("L"): # only apply to models that are learning
+            check = random.random()
+            if check < (1 - self.epsilon):
+                return True
+            else:
+                return False
+        elif self.mode == "FIXED":
+            return True
+        else:
+            raise ValueError("Unknown Mode")
 
     def make_model_move(self,b,tt,p):
         #print(f"Turns taken so far {tt}")
         #print(f"Making decision for state: {b}")
-        choice = self.use_learning_table() # TODO: Define this function properly
-        if choice: # Need episode to be available here, not tt
-            #print("Making a random choice")
-            pm = get_possible_moves(b)
-            m = random.choice(pm)
-            mr, mc = int(m[0]), int(m[1])
-            m = str(m[0]) + str(m[1])
-        else:
+        choice = self.use_learning_table()
+        if choice:
+#            if "P1" in self.name:
+#                print(f"{self.name}model based choice")
             hits = self.model_df[self.model_df["state"] == str(b)][columns]
             hits = hits.transpose()
             hits.columns = ["values"]
@@ -231,9 +244,16 @@ class Player:
             m = str(random.choice(list(top_answers["index"])))
             mr, mc = int(m[0]), int(m[1])
             #print(f"{self.name}'s move is {m}")
+        else:
+#            if "P1" in self.name:
+#                print(f"{self.name} Making a random choice")
+            pm = get_possible_moves(b)
+            m = random.choice(pm)
+            mr, mc = int(m[0]), int(m[1])
+            m = str(m[0]) + str(m[1])
+            #print(f"{self.name} random move is {m}")
 
         b, status, description = make_move(p,b,mr,mc,tt)
-        self.epsilon -= 0.001
         return b, status, description, m
     
     def make_agent_move(self,b,tt,p):
@@ -267,5 +287,8 @@ class Player:
                 break
             if (not positive_reinforcement) & (reward_left >= 0):
                 break
+        epsilon_increment = 0.001 #TODO this should be configurable hyperparameter
+        if 0 <= self.epsilon - epsilon_increment: # The floor for epsilon is 0
+            self.epsilon -= epsilon_increment
 
 
