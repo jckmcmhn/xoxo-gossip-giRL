@@ -138,7 +138,7 @@ if training != 1:
 
 
 
-    print("#THE HEADLINES")
+    print("# THE HEADLINES")
     print(f"\nFor this experiment, there were {n} training episodes and {n_validation} validation episodes per benchmark, epsilon was {epsilon}, the win reward was {reward_win}, the loss reward was {reward_lose} and the draw reward was {reward_draw}\n")
     print(f"Across {test * n_validation} validation episodes, p1 won {p1_validation_wins} times ({100 * round(p1_validation_wins / (test * n_validation), 2)}%)")
     print(f"Across {test * n_validation} validation episodes, p1 lost {p1_validation_loses} times ({100 * round(p1_validation_loses / (test * n_validation), 2)}%)")
@@ -146,6 +146,8 @@ if training != 1:
 
     if training:
         print("\nHere is how the model performed in training:")
+        # A training agent will spend quite a lot of its training episodes making random moves.
+        # So this figure should give some indication that the agent can now perform better than random guesses, but an "all policy all the time" test is needed to get the true performance
         print(training_headline)
 
     print("\nHere is how the model performed in validation:")
