@@ -6,6 +6,16 @@ from time import sleep
 
 columns = ["00", "01", "02", "10", "11", "12", "20", "21", "22"]
 
+def whose_turn(state):
+    cells = np.concatenate(state)
+    filled_cells = len([cell for cell in cells if cell != 0])
+    if 0 == filled_cells % 2:
+        print("It is X's turn")
+        return -1
+    else:
+        print("It is O's turn")
+        return 1
+
 def check_for_winner(b, tt):
     """
     Docstring for check_for_winner
@@ -123,22 +133,22 @@ class Player:
             print(f"\nHello, my name is {self.name}.")
         if self.mode.startswith("LEARNING"):
             print(f"I'm an agent in this Reinforcement mode scenario and I learn as I play the game.")
-            
+            print(f"My initial model is stored in this location: {self.in_file}. My final model will be saved to this location: {self.out_file}.")
             if self.mode == "LEARNING_DEMO":
                 print("I save my updated model to disk at the end of every episode for demonstration purposes. This could be quite slow on your computer")
         elif self.mode == "FIXED":
-            print(f"I used to be an agent. I learned how to play the game across #TODO episodes.")
+            print(f"I used to be an agent like you. My model is stored in this location: {self.in_file}.")
             print(f"I REFUSE TO LEARN ANYTHING ELSE!")
-            print(f"My model is stored in this location: {self.file} and has {len(self.model_df)} rows.\n")
         elif self.mode.startswith("RULES_IMPERFECT"):
-            print(f"I play the game based on a set of simple, fixed rules. My algorithm is 'imperfect'—that is, it won't make 'perfect' moves every time.") # It uses an em-dash because it's technically ai, do you get it? Well? Do you?
+            print(f"I play the game based on a set of simple, fixed rules. My algorithm is 'imperfect'—that is, it won't make the 'perfect' moves every time.") # It uses an em-dash because it's technically ai, do you get it? Well? Do you?
             if self.mode.endswith("NOT_LOCKED_IN"):
                 print("That said, I'm not really paying attention.")
 
-    def __init__(self, name, file, mode, epsilon = 70, rewards = [0,0,0]):
+    def __init__(self, name, mode, in_file = "blank_q_learning_table.csv", out_file = "q_learning_table.csv", epsilon = 70, rewards = [0,0,0]):
         self.name = name
-        self.file = file
-        self.model_df = pd.read_csv(self.file)
+        self.in_file = in_file
+        self.out_file = out_file
+        self.model_df = pd.read_csv(in_file)
         self.model_df.columns = ["state"] + columns
         self.mode = mode
         self.reward_win = rewards[0]
@@ -154,7 +164,6 @@ class Player:
         self.draws = 0
         self.draws_as_x = 0
         self.draws_as_o = 0
-        self.greet()
 
     def make_rules_based_move(self,b,tt,p,locked_in = True):
         # A player that isn't locked in will still always take winning moves, but any moves taken before that may be at random
@@ -251,7 +260,7 @@ class Player:
             self.model_df.loc[self.model_df['state'] == str(reinforce_state), reinforce_action] += reward_left
             #after = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
             if self.mode == "LEARNING_DEMO":
-                self.model_df.to_csv(self.file, index = False) # This will be a bit slow, but will make a cool visual
+                self.model_df.to_csv(self.out_file, index = False) # This will be a bit slow, but will make a cool visual
                 # if you can watch the csv update in real time
                 sleep(0.2) # Have to give your PC time to read the new file
             if positive_reinforcement & (reward_left <= 0):

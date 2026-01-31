@@ -137,17 +137,21 @@ def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
         print(f"{p2.name} total losses: {n - p2.wins - draws}.")
         print(f"For games where {p2.name} won, the average number of turns taken in winning games was {statistics.mean(p2.tt_wins)}, the max was {max(p2.tt_wins)} and the min was {min(p2.tt_wins)}")
     else:
-        print(f"\n{p2.name} total wins: 0")
+        headline = f"{p2.name} total wins: 0" 
+        print(f"\n{headline}")
+
     if p2.wins != 0:
-        print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
+        headline = f"{p1.name} won {p1.wins / p2.wins} more times than {p2.name}"
+        print(f"\n{headline}")
 
     if (n > 10) and (p1.mode.startswith("LEARNING")):
         print("Here is the first few states of the p1 model at the end of training.")
         print("\nAssuming you're training a model to do well, if one of 00, 02, 20 or 22 is not the highest value for the top row, we're in trouble")      
         print(p1.model_df[0:4])
-        print(f"\nUpdating file {p1.file}")
-        p1.model_df.to_csv(p1.file, index = False)
+        print(f"\nUpdating file {p1.out_file}")
+        p1.model_df.to_csv(p1.out_file, index = False)
 
     if p2.mode.startswith("LEARNING"):
         print("p2 model at end of training: ")
         print(p2.model_df)
+    return(p1.wins, p2.wins, draws, headline)
