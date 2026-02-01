@@ -1,139 +1,163 @@
 import argparse
-from xo_functions import prettify_board, prettify_boards, Player
-from time import sleep
-
-delay = 0.2 #TODO: Should be an argument
-demo_mode = False #TODO: Should be an argument
+from xo_functions import Player
+from training_functions import run_training_loop
+import datetime
+start = datetime.datetime.now()
+print(start)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--file", help = "What file are you using to load or save the model weights?")
+parser.add_argument("-i", "--in_file", help = "What file are you using to load the model weights?")
+parser.add_argument("-o", "--out_file", help = "What file are you using to save the model weights?")
 parser.add_argument("-n", "--number_of_episodes", help = "How many training episodes to run?")
-parser.add_argument("-r", "--rewards", help = "What rewards are applied. Format: w|l|d Sample: '20|-10|10' ")
+parser.add_argument("-r", "--rewards", help = "What rewards are applied. Format: w|l|d Sample: '[20|-10|10]' ")
 parser.add_argument("-e", "--epsilon", help = "todo")
+parser.add_argument("-ei", "--epsilon_increment", help = "todo")
+parser.add_argument("-t", "--training", help = "Are you training a model in this run: 0 for Validate Model Only, 1 for Train Model Only, 2 for Train and Validate Model")
 
 # Read arguments from command line
 args = parser.parse_args()
 
-file = args.file
+
+in_file = args.in_file
+out_file = args.out_file
 n = int(args.number_of_episodes)
-reward_win, reward_lose, reward_draw = args.rewards.split("|")
-reward_win, reward_lose, reward_draw = int(reward_win), int(reward_lose), int(reward_draw)
+epsilon = float(args.epsilon)
+epsilon_increment = float(args.epsilon_increment)
+rewards = args.rewards.replace("[","").replace("]","").split("|")
+reward_win, reward_lose, reward_draw = rewards
+reward_win, reward_lose, reward_draw = float(reward_win), float(reward_lose), float(reward_draw)
+rewards = [reward_win, reward_lose, reward_draw]
+n = int(args.number_of_episodes)
+training = int(args.training)
 
-is_p2_learning = False
-p1 = Player("Tom (P1)",file,True)
-p2 = Player("Gregg (P2)",file,is_p2_learning)
-p1.greet()
-p2.greet()
 
-x_wins, o_wins = 0, 0 # These are wins for X or O
-stalemates = 0
-for episode in range(0,n):
-    if 0 == episode % 2: # alternate who goes first
-        x_player, o_player = p1, p2
+if training > 0:
+    print("Training")
+    # For now, always make P1 the model player you are most interested in assesing, with p2 as the benchmark
+    #p1 = Player("Tom Cruise's character from Live Die Repeat / Edge Of Tomorrow (P1)","LEARNING", in_file, out_file, epsilon, rewards)
+    p1 = Player("Tom Cruise's character from Live Die Repeat / Edge Of Tomorrow (P1)","LEARNING_SHARING", in_file, out_file, epsilon, rewards, epsilon_increment)
+    p1.greet()
+    #p2 = Player("Gregg (P2)","FIXED", "experiments/20260131_new_champ_15.csv")
+    p2 = Player("Bill Murray in GroundHog Day (P1)","LEARNING_SHARING", in_file, out_file, epsilon, rewards, epsilon_increment)
+    #p2 = Player("Tom Cruise's character from Live Die Repeat / Edge Of Tomorrow (P1)","LEARNING", in_file, out_file, epsilon, rewards)
+    #p2 = Player("Al (P2)",file,"RULES_IMPERFECT")
+    p2.greet()
+    p1_wins, p2_wins, draws, training_headline = run_training_loop(p1, p2, n, "ALTERNATE", 0)
+
+if training != 1:
+    print("\n------------\n")
+    print("VALIDATION STEP")
+    print("\n------------\n")
+    if n > 2000:
+        n_validation = 2000 # Hope this doesn't "nvalidate" the training approach!
     else:
-        x_player, o_player = p2, p1
-    x_player_m, o_player_m, x_player_b, o_player_b = [], [], [], []
-    
-    p1.actions, p1.states, p2.actions, p2.states = [], [], [], []
-    p1_actions, p1_states, p2_actions, p2_states = [], [], [], []
-    turn_end_states = []
+        n_validation = int(n / 2) # "nvalidate", it's one letter off invalidate, do you get it?
 
-    print(f"----------------------------------")
-    print(f"Episode {episode + 1}: {x_player.name} is X and {o_player.name} is O")
-    print(p1.actions)
 
-    b = [[0,0,0],[0,0,0],[0,0,0]]
-    status = 0
-    tt = 0
-    while status == 0 and tt != 9:
-        if x_player.name == p1.name:
-            p1_states.append(b)
-        x_player.states.append(str(b)) # HAS TO BE A STRING, 
-        x_player_b.append(b)
-        x_turn = True
-        b, status, description, m = x_player.make_model_move(b,tt,-1)
-        tt += 1
-        x_player_m.append(m)
-        x_player.actions.append(m)
-        if demo_mode:
-            print(f"{x_player.name}'s turn.")
-            prettify_board(b, m)
-            sleep(delay * 0.5)
-        #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
-        turn_end_states.append(str(b))
-        if status == 0 and tt != 9:
-            o_player.states.append(str(b))
-            o_player_b.append(b)
-            x_turn = False
-            b, status, description, m = o_player.make_model_move(b,tt,1)
-            tt += 1
-            o_player_m.append(m)
-            o_player.actions.append(m)
-            if demo_mode:
-                print(f"{o_player.name}'s turn.")
-                prettify_board(b, m)
-                sleep(delay * 0.5)
-            #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
-            turn_end_states.append(str(b))
-    print(f"This game is over\n")
-    if status == 1:
-        if x_turn:
-            print(f"{x_player.name} (playing as X) won.\n")
-            if not demo_mode:
-                prettify_board(b)
-            x_wins += 1
-            x_player.wins += 1
-            x_player.wins_as_x += 1
-            winner = x_player.name
+    test = 0
+    p1_validation_wins = 0
+    p1_validation_loses = 0
+    validation_draws = 0
+    validation_headlines = []
 
-        else:
-            print(f"{o_player.name} (playing as O) won.\n")
-            if not demo_mode:
-                print("Final board")
-                prettify_board(b)
-            o_wins += 1
-            o_player.wins += 1
-            winner = o_player.name
-        
-        # For now, let's take it that p1 is always the one we want to learn
-        if winner == p1.name: #TODO: c'mon man
-            print(f"Here is {p1.name}'s winning game summary.\n")
-            prettify_boards(turn_end_states)
-            for i, reinforce_action in enumerate(p1.actions):
-                # reinforce_action so named to distinguish from actions which aren't necessarily to be reinforced
-                reinforce_state = p1.states[i]
-                before = p1.model_df[p1.model_df["state"] == str(reinforce_state)][reinforce_action]
-                #print("before")
-                #print(before)
-                p1.model_df.loc[p1.model_df['state'] == str(reinforce_state), reinforce_action] += 1.0
-                after = p1.model_df[p1.model_df["state"] == str(reinforce_state)][reinforce_action]
-                #print("after")
-                #print(after)
-            #print(p1.model_df)
-            #p1.model_df.to_csv(file, index = False)
+    test += 1
+    print("\n----------")
+    print(f"TEST {test}: Trained model vs untrained model")
+    print("----------")
+    p1 = Player("Tom (P1)","FIXED", out_file)
+    p1.greet()
+    p2 = Player("Gregg (P2)","FIXED")
+    p2.greet()
+    p1_wins, p2_wins, draws, headline = run_training_loop(p1, p2, n_validation, "ALTERNATE", 0)
+    p1_validation_wins += p1_wins
+    p1_validation_loses += p2_wins
+    validation_draws += draws
+    validation_headlines.append(headline)
 
-    if status == 2:
-        print("It was a stalemate")
-        stalemates += 1
-    if demo_mode:
-        sleep(delay * 1.5)
+    test += 1
+    print("\n----------")
+    print(f"TEST {test}: Trained model vs imperfect rules")
+    print("----------")
+    p1 = Player("Tom (P1)","FIXED", out_file)
+    p1.greet()
+    p2 = Player("Al (P2)","RULES_IMPERFECT")
+    p2.greet()
+    p1_wins, p2_wins, draws, headline = run_training_loop(p1, p2, n_validation, "ALTERNATE", 0)
+    p1_validation_wins += p1_wins
+    p1_validation_loses += p2_wins
+    validation_draws += draws
+    validation_headlines.append(headline)
 
-print(f"\nX wins: {x_wins}")
-print(f"O wins: {o_wins}")
-print(f"Stalemates: {stalemates}")
-if p1.wins != 0:
-    print(f"\n{p1.name} total wins: {p1.wins}. Of those, {p1.wins_as_x} ({round(100 * p1.wins_as_x / p1.wins, 2)}%) were as X.")
-else:
-    print(f"\n{p1.name} total wins: 0")
-if p2.wins != 0:
-    print(f"{p2.name} total wins: {p2.wins}. Of those, {p2.wins_as_x} ({round(100 * p2.wins_as_x / p2.wins, 2)}%) were as X.")
-else:
-    print(f"\n{p2.name} total wins: 0")
+    test += 1
+    print("\n----------")
+    print(f"TEST {test}: Trained model vs distracted imperfect rules")
+    print("----------")
+    p1 = Player("Tom (P1)","FIXED", out_file)
+    p1.greet()
+    p2 = Player("Al (P2)","RULES_IMPERFECT_NOT_LOCKED_IN")
+    p2.greet()
+    p1_wins, p2_wins, draws, headline = run_training_loop(p1, p2, n_validation, "ALTERNATE", 0)
+    p1_validation_wins += p1_wins
+    p1_validation_loses += p2_wins
+    validation_draws += draws
+    validation_headlines.append(headline)
 
-print(f"\n{p1.name} won {p1.wins / p2.wins} more times than {p2.name}")
-print("Here is the first few states of the p1 model at the end of training: ")
-print(p1.model_df[0:5])
+    test += 1
+    print("\n----------")
+    print(f"TEST {test}: Trained model vs weakly trained model")
+    print("----------")
+    # python .\run_training_job.py -i blank_q_learning_table.csv -o weakly_trained.csv --reward '[10|0|5]' -e 70 -n 100
+    # python .\run_training_job.py -o experiments/weakly_trained_2.csv -i blank_q_learning_table.csv --reward '[2|-2|1]' -e 1 -ei 0.0002 -n 1000 -t 2 # trained against self
+    p1 = Player("Tom (P1)","FIXED", out_file)
+    p1.greet()
+    p2 = Player("Hennimore (P2)","FIXED", "experiments/weakly_trained_2.csv")
+    p2.greet()
+    p1_wins, p2_wins, draws, headline = run_training_loop(p1, p2, n_validation, "ALTERNATE", 0)
+    p1_validation_wins += p1_wins
+    p1_validation_loses += p2_wins
+    validation_draws += draws
+    validation_headlines.append(headline)
 
-if is_p2_learning:
-    print("p2 model at end of training: ")
-    print(p2.model_df) # This should show all zeroes
+    test += 1
+    print("\n----------")
+    print(f"TEST {test}: Trained model vs the champ")
+    print("----------")
+    p1 = Player("Tom (P1)","FIXED", out_file)
+    p1.greet()
+    p2 = Player("The Champ (P2)","FIXED", "experiments/20260201_new_champ_1.csv")
+    p2.greet()
+    p1_wins, p2_wins, draws, headline = run_training_loop(p1, p2, n_validation, "ALTERNATE", 0)
+    p1_validation_wins += p1_wins
+    p1_validation_loses += p2_wins
+    validation_draws += draws
+    validation_headlines.append(headline)
+
+    print("\n----------")
+    print(f"Extra Test: Trained model vs itself. Not counted in final metrics") # This test is interesting, but makes the final totals harder to make sense of
+    print("----------")
+    p1 = Player("Tom (P1)","FIXED", out_file)
+    p1.greet()
+    p2 = Player("Tom (P2)","FIXED", out_file)
+    p2.greet()
+    p1_wins, p2_wins, draws, headline = run_training_loop(p1, p2, n_validation, "ALTERNATE", 0)
+
+
+
+    print("# THE HEADLINES")
+    print(f"\nFor this experiment, there were {n} training episodes and {n_validation} validation episodes per benchmark, epsilon was {epsilon}, the win reward was {reward_win}, the loss reward was {reward_lose} and the draw reward was {reward_draw}\n")
+    print(f"Across {test * n_validation} validation episodes, p1 won {p1_validation_wins} times ({100 * round(p1_validation_wins / (test * n_validation), 2)}%)")
+    print(f"Across {test * n_validation} validation episodes, p1 lost {p1_validation_loses} times ({100 * round(p1_validation_loses / (test * n_validation), 2)}%)")
+    print(f"Across {test * n_validation} validation episodes, there were {validation_draws} draws ({100 * round(validation_draws / (test * n_validation), 2)}%)")
+
+    if training:
+        print("\nHere is how the model performed in training:")
+        # A training agent will spend quite a lot of its training episodes making random moves.
+        # So this figure should give some indication that the agent can now perform better than random guesses, but an "all policy all the time" test is needed to get the true performance
+        print(training_headline)
+
+    print("\nHere is how the model performed in validation:")
+    for validation_headline in validation_headlines:
+        print(validation_headline)
+
+    end = datetime.datetime.now()
+    print(end - start)

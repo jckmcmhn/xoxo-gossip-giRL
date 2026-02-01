@@ -1,4 +1,4 @@
-from xo_functions import get_possible_moves, check_for_winner
+from xo_functions import get_possible_actions, check_for_winner
 import re
 import pandas as pd
 
@@ -31,7 +31,7 @@ for turn in range(0,9):
         i += 1
         new_row = pd.DataFrame(columns = cols)
         new_row["state"] = [str(starting_state)]
-        actions = get_possible_moves(starting_state)
+        actions = get_possible_actions(starting_state)
         for action in actions:
             possible_action_count += 1
             action_str = create_name(action)
@@ -39,7 +39,7 @@ for turn in range(0,9):
             new_state = [row[:] for row in starting_state] # Thank you, random redditor, for your help here
             #https://www.reddit.com/r/learnpython/comments/1imbmpo/changing_one_variable_automatically_changes/
             new_state[action[0]][action[1]] = p
-            if check_for_winner(new_state) is False: # If it is a winning move, the game is over, we don't need to take this branch further
+            if check_for_winner(new_state, turn )[0] != 1: # If it is a winning action, the game is over, we don't need to take this branch further
                 new_states.append(new_state)
         new_rows.append(new_row)
     possible_states.append(new_states)
@@ -50,7 +50,7 @@ df = pd.concat(new_rows, ignore_index= True)
 print(df)
 df = df.drop_duplicates() #TODO: there might be a way to write the code above so that no duplicates are created in the first place
 print(df)
-df.to_csv("qmap.csv", index = False)
+df.to_csv("blank_q_learning_table.csv", index = False)
 
 ### Everything below this point was part of an approach which in the end was not necessary
 possible_states_flat = []
