@@ -23,7 +23,7 @@ def update_player_objects(player, status, tt, log_level = 1):
             player.draws_as_o += 0
     
     if player.mode.startswith("LEARNING"):
-        player.update_model(status, tt)
+        player.update_policy(status, tt)
     return player #todo, is this necessary?
 
 
@@ -52,7 +52,7 @@ def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
             p1.playing_as_str, p2.playing_as_str = "O", "X"
         else:
             raise ValueError("Invalid alternate_x value")
-        x_player_m, o_player_m, x_player_b, o_player_b = [], [], [], []
+        x_player_m, o_player_m, x_player_s, o_player_s = [], [], [], []
 
         p1.actions, p1.states, p2.actions, p2.states = [], [], [], []
         turn_end_states = []
@@ -61,39 +61,39 @@ def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
             print(f"----------------------------------")
             print(f"Episode {episode + 1}: {x_player.name} is X and {o_player.name} is O")
 
-        b = [[0,0,0],[0,0,0],[0,0,0]]
+        state = [[0,0,0],[0,0,0],[0,0,0]]
         status = 0
         tt = 0
         while status == 0 and tt != 9:
             if x_player.name == p1.name:
-                p1.states.append(b)
-            x_player.states.append(str(b)) # HAS TO BE A STRING, 
-            x_player_b.append(b)
+                p1.states.append(state) #TODO: what is this for?
+            x_player.states.append(str(state)) # HAS TO BE A STRING, 
+            x_player_s.append(state)
             x_turn = True
-            b, status, description, m = x_player.make_agent_move(b,tt,-1)
+            state, status, description, m = x_player.make_agent_action(state,tt,-1)
             tt += 1
             x_player_m.append(m)
             x_player.actions.append(m)
             if demo_mode:
                 print(f"{x_player.name}'s turn.")
-                prettify_board(b)
+                prettify_board(state)
                 sleep(delay * 0.5)
-            #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
-            turn_end_states.append(str(b))
+            #print(f"After this most recent action: b is {b}, status is {status} and tt is {tt}")
+            turn_end_states.append(str(state))
             if status == 0 and tt != 9:
-                o_player.states.append(str(b))
-                o_player_b.append(b)
+                o_player.states.append(str(state))
+                o_player_s.append(state)
                 x_turn = False
-                b, status, description, m = o_player.make_agent_move(b,tt,1)
+                state, status, description, m = o_player.make_agent_action(state,tt,1)
                 tt += 1
                 o_player_m.append(m)
                 o_player.actions.append(m)
                 if demo_mode:
                     print(f"{o_player.name}'s turn.")
-                    prettify_board(b)
+                    prettify_board(state)
                     sleep(delay * 0.5)
-                #print(f"After this most recent move: b is {b}, status is {status} and tt is {tt}")
-                turn_end_states.append(str(b))
+                #print(f"After this most recent action: state is {state}, status is {status} and tt is {tt}")
+                turn_end_states.append(str(state))
         if status == 1: # someone won
             if x_turn: # X won
                 if log_level != 0:
@@ -122,7 +122,7 @@ def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
             prettify_boards(turn_end_states)
         if demo_mode:
             print("Final board")
-            prettify_board(b)
+            prettify_board(state)
             sleep(delay * 1.5)
 
     print(f"\nX wins: {x_wins} ({round(100 * x_wins / n, 2)}%)")
@@ -138,23 +138,23 @@ def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
         print(f"\n{p2.name} total wins: {p2.wins}. Of those, {p2.wins_as_x} ({round(100 * p2.wins_as_x / p2.wins, 2)}%) were as X.")
         print(f"{p2.name} total losses: {n - p2.wins - draws}.")
         print(f"For games where {p2.name} won, the average number of turns taken in winning games was {statistics.mean(p2.tt_wins)}, the max was {max(p2.tt_wins)} and the min was {min(p2.tt_wins)}")
-    else:
-        headline = f"{p2.name} total wins: 0. There were {draws} ({round(100 * draws / n, 2)}%) draws" 
-        print(f"\n{headline}")
 
     if p2.wins != 0:
-        headline = f"{p1.name} won {p1.wins / p2.wins} more times than {p2.name}. There were {draws} ({round(100 * draws / n, 2)}%) draws"
+        headline = f"{p1.name} won {p1.wins} times. {p2.name} won {p2.wins} times. P1 won {p1.wins / p2.wins} more times than {p2.name}. There were {draws} ({round(100 * draws / n, 2)}%) draws"
         print(f"\n{headline}")
+    else:
+        headline = f"{p1.name} won {p1.wins} times. {p2.name} did not win once. There were {draws} ({round(100 * draws / n, 2)}%) draws" 
+        print(f"\n{headline}")        
 
     if (n > 10) and (p1.mode.startswith("L")):
-        print("Here is the first few states of the p1 model at the end of training.")
-        print("\nAssuming you're training a model to do well, if one of 00, 02, 20 or 22 is not the highest value for the top row, we're in trouble")      
-        print(p1.model_df[0:4])
+        print("Here is the first few states of the p1 policy at the end of training.")
+        print("\nAssuming you're training a policy to do well, if one of 00, 02, 20 or 22 is not the highest value for the top row, we're in trouble")      
+        print(p1.policy_df[0:4])
         print(f"\nUpdating file {p1.out_file}")
-        p1.model_df.to_csv(p1.out_file, index = False)
+        p1.policy_df.to_csv(p1.out_file, index = False)
         p1.sign_off()
 
     if p2.mode.startswith("LEARNING"):
-        print("p2 model at end of training: ")
-        print(p2.model_df)
+        print("p2 policy at end of training: ")
+        print(p2.policy_df)
     return(p1.wins, p2.wins, draws, headline)
