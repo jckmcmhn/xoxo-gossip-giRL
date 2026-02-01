@@ -177,7 +177,9 @@ class Player:
     
     def sign_off(self):
         if self.mode.startswith("L"):
-            print(f"For {self.name} the final epsilon value was {self.epsilon}")
+            msg = f"For {self.name} the final epsilon value was {self.epsilon}"
+            print(msg)
+            return msg
 
 
     def make_rules_based_action(self,state,tt,p,locked_in = True):
