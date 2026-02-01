@@ -59,7 +59,7 @@ The process I have for updating the values, at the moment, is just halving the r
 ### Why does **THE** CHAMP always pick the middle square?
 This bothers me as well. According to the XOXOlogists out there, the "perfect" first move is a corner square. Previous policies have picked up on that but otherwise played badly. More training, hyperparameter tuning and maybe even changes to the algorithm will be needed to figure this one out.
 
-There is maybe an argument to be made that the middle sqaure is the best first square for X _unless_ you're playing against someone who always plays a perfect game as O, but that's a whole other thing.
+There is maybe an argument to be made that the middle sqaure is the best first square for X when you're playing against an average player and that a corner square is the best choice if playing against a player who always plays "perfectly", but that's a whole other thing.
 
 <sup>1</sup>: Which at time of writing I believe I have wrongly referred to as a "model" in numerous places, that's on the to-do list to fix.
 
