@@ -12,15 +12,15 @@ To play against the agent, just run
 ``python play_against_computer.py``
 
 There is an --opponent (-o) argument for determing which "agent" you play against.
-- best: "THE CHAMP!". This is currently best performing agent
-- rlhf: This is a copy of THE CHAMP. Your game against it will be used to update its game playing policy through a basic Reinforcement Learning Human Feedback script.
-- loser: "LOSER MODE". This agent was trained with the same intensity as THE CHAMP, but was rewarded for losing games and punished for winning them
-- rlhf_loser: This is a copy of the LOSER MODE agent. Your game against it will be used to update its game playing policy so that it will start to play better. Could take years though, so not for the faint of heart...
+- best: **"THE CHAMP!"**. This is the currently best performing agent
+- rlhf: This is a copy of **THE CHAMP**. Your game against it will be used to update its game playing policy through a basic Reinforcement Learning Human Feedback script.
+- loser: **"LOSER MODE"**. This agent was trained with the same intensity as THE CHAMP, but was rewarded for losing games and punished for winning them
+- rlhf_loser: This is a copy of the **LOSER MODE** agent. Your game against it will be used to update its game playing policy so that it will start to play better. Could take years though, so not for the faint of heart...
 - rules: This agent plays using an incomplete set of rules for playing the game. It doesn't play a perfect game, but it will, for example, always take a winning move if it can. No reinforcement learning was involved in creating this one.
 - random: The computer picks (valid) moves at random
-- weakly_trained: This agent was very lightly trained. It plays well and outperforms all the other agents except THE CHAMP. This is a work-in-progress to try and identify the configuration of hyperparameters that yields THE CHAMP level performance with the fewest training episodes
+- weakly_trained: This agent was very lightly trained. It plays well and outperforms all the other agents except **THE CHAMP**. This is a work-in-progress to try and identify the configuration of hyperparameters that yields **THE CHAMP** level performance with the fewest training episodes
 
-If no opponent argument is given, you will play against THE CHAMP.
+If no opponent argument is given, you will play against **THE CHAMP**.
 
 ### Training the Agent
 WIP: The script I have for this works but is a little too noisy and involves too many parameters to easily explain at the moment.
@@ -56,7 +56,7 @@ The process I have for updating the values, at the moment, is just halving the r
 - I suspect there's probably some clever mathematical nuances in the difference between a reward and value that I've kind of lost here.
 - I'm sure there's a clever mathematical way to represent an Xs and Os board or at least to compress down the list of possible states.
 
-### Why does THE CHAMP always pick the middle square
+### Why does **THE** CHAMP always pick the middle square?
 This bothers me as well. According to the XOXOlogists out there, the "perfect" first move is a corner square. Previous policies have picked up on that but otherwise played badly. More training, hyperparameter tuning and maybe even changes to the algorithm will be needed to figure this one out.
 
 There is maybe an argument to be made that the middle sqaure is the best first square for X _unless_ you're playing against someone who always plays a perfect game as O, but that's a whole other thing.
