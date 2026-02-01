@@ -89,13 +89,35 @@ def make_computer_action(p,state,tt):
     state, status, description = make_action(p,state,m[0],m[1],tt)
     return state, status
 
-def prettify_board(state):
+def prettify_board(state, highlight = ""):
+    """
+    Docstring for prettify_board
+    If you are a UX person or someone who writes a lot of command line utilities:
+        I know this is very clumsy, please do not get mad at me
+    
+    :param state: The board to visualise
+    :param highlight: The position to highlight
+    """
     map = {-1: "X", 1: "O", 0: " "}
+    if highlight != "":
+        hlr, hlc = int(highlight[0]), int(highlight[1])
+    else:
+        hlr, hlc = 10, 10 # these could be any numbers except 0, 1 and 2
     print("")
     vert = " -----------" 
     print(vert)
-    for row in state:
-        new = f"| {map[row[0]]} | {map[row[1]]} | {map[row[2]] } |"
+    for ir, row in enumerate(state):
+        if ir != hlr:
+            new = f"| {map[row[0]]} | {map[row[1]]} | {map[row[2]] } |"
+        else:
+            new = ""
+            for ic in range(0,3):
+                if ic == hlc:
+                    cell = "| " + "\033[92m{}\033[00m".format(map[row[ic]]) + " "
+                else:
+                    cell = "| " + str(map[row[ic]]) + " "
+                new = new + cell
+            new = new + "|"
         print(new)
         print(vert)
     print("")

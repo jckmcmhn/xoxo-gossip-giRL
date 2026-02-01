@@ -117,7 +117,6 @@ if training != 1:
     p1_validation_loses += p2_wins
     validation_draws += draws
     validation_headlines.append(headline)
-    
 
     test += 1
     print("\n----------")
@@ -133,7 +132,6 @@ if training != 1:
     validation_draws += draws
     validation_headlines.append(headline)
 
-    #test += 1
     print("\n----------")
     print(f"Extra Test: Trained model vs itself. Not counted in final metrics") # This test is interesting, but makes the final totals harder to make sense of
     print("----------")
