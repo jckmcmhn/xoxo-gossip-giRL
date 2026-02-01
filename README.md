@@ -13,7 +13,7 @@ To play against the agent, just run
 
 There is an --opponent (-o) argument for determing which "agent" you play against.
 - best: **"THE CHAMP!"**. This is the currently best performing agent
-- rlhf: This is a copy of **THE CHAMP**. Your game against it will be used to update its game playing policy through a basic Reinforcement Learning Human Feedback script.
+- rlhf: This is a copy of **THE CHAMP**. Your game against it will be used to update its game playing policy.
 - loser: **"LOSER MODE"**. This agent was trained with the same intensity as THE CHAMP, but was rewarded for losing games and punished for winning them
 - rlhf_loser: This is a copy of the **LOSER MODE** agent. Your game against it will be used to update its game playing policy so that it will start to play better. Could take years though, so not for the faint of heart...
 - rules: This agent plays using an incomplete set of rules for playing the game. It doesn't play a perfect game, but it will, for example, always take a winning move if it can. No reinforcement learning was involved in creating this one.
@@ -34,12 +34,12 @@ I developed all of this on what I'd say is an entry-level pre-built gaming PC fr
 The way this learning algorithm works is as follows:
 - Players play until the game ends, either p1 wins, p2 wins or 9 moves are made without anyone winning<sup>2</sup>.
 - If one or both players are set as learning agents:
- - If a reward has been configured for winning, the script takes the winning player's actions and works backwards through them. The last action gets the full reward value, the one before that gets slightly less of the reward value and so on
- - If a reward has been configured for losing or draws, the same process is carried out.
- - This should mean that moves that win the game have very high values and the moves that led up to that position should have relatively high values also
-  - For example, while I could not always get the policies to take a corner piece on the first turn (which is apparently the 'correct' move) they did consistently favour the middle square on the first move
- - Moves taken right before an opponent made a winning move should have very low values and the moves that led up to that position such have relatively low values
- - Moves that lead to draws (which I have tended to reward slightly less than winning) should have values in the middle
+  - If a reward has been configured for winning, the script takes the winning player's actions and works backwards through them. The last action gets the full reward value, the one before that gets slightly less of the reward value and so on
+  - If a reward has been configured for losing or draws, the same process is carried out.
+  - This should mean that moves that win the game have very high values and the moves that led up to that position should have relatively high values also
+    - For example, while I could not always get the policies to take a corner piece on the first turn (which is apparently the 'correct' move) they did consistently favour the middle square on the first move
+  - Moves taken right before an opponent made a winning move should have very low values and the moves that led up to that position such have relatively low values
+  - Moves that lead to draws (which I have tended to reward slightly less than winning) should have values in the middle
 
 ## Corrections and Know Issues
 ### Theory
@@ -47,8 +47,8 @@ I realised a little too late into the project that I'd slightly misunderstood so
 
 From my reading, it seems that the usual thing to do is to update the q-table per iteration (at the end of each turn), not per episode which is what I'm doing here.
 On the other hand:
- - Xs and Os is strictly linear. Within a single game, there is no way to find yourself back at a position you were in previously, so I would argue there's no need to update the policy before a game is over
- - Players can make at max 5 or 4 moves per game, so it is not as if a lot of iterations pass before each update anyway
+- Xs and Os is strictly linear. Within a single game, there is no way to find yourself back at a position you were in previously, so I would argue there's no need to update the policy before a game is over
+- Players can make at max 5 or 4 moves per game, so it is not as if a lot of iterations pass before each update anyway
 
 The process I have for updating the values, at the moment, is just halving the reward at each step and adding it to the current value, none of that fancy "big city" _temporal distance learning_ for me, thanks.
 
