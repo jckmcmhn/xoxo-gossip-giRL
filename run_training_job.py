@@ -51,7 +51,7 @@ if training != 1:
     if n > 2000:
         n_validation = 2000 # Hope this doesn't "nvalidate" the training approach!
     else:
-        n_validation = int(n / 10) # "nvalidate", it's one letter off invalidate, do you get it?
+        n_validation = int(n / 2) # "nvalidate", it's one letter off invalidate, do you get it?
 
 
     test = 0

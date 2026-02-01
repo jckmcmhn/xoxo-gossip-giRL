@@ -152,7 +152,9 @@ def run_training_loop(p1, p2, n, alternate_x = "ALTERNATE", log_level = 3):
         print(p1.policy_df[0:4])
         print(f"\nUpdating file {p1.out_file}")
         p1.policy_df.to_csv(p1.out_file, index = False)
-        p1.sign_off()
+        sign_off = p1.sign_off()
+        if sign_off is not None:
+            headline = headline + "\n" + sign_off
 
     if p2.mode.startswith("LEARNING"):
         print("p2 policy at end of training: ")
