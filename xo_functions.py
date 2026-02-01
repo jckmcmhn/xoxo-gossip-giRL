@@ -228,7 +228,7 @@ class Player:
         returning False here means "random choice"
         """
 
-        if self.mode.startswith("L"): # only apply to policys that are learning
+        if self.mode.startswith("L"): # only apply to policies that are learning
             check = random.random()
             if check < (1 - self.epsilon):
                 return True
