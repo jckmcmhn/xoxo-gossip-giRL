@@ -132,19 +132,18 @@ class Player:
         else:
             print(f"\nHello, my name is {self.name}.")
         if self.mode.startswith("LEARNING"):
-            print(f"I'm an agent in this Reinforcement mode scenario and I learn as I play the game.")
+            print(f"I'm an agent in this Reinforcement Learning scenario and I learn as I play the game.")
             print(f"My initial model is stored in this location: {self.in_file}. My final model will be saved to this location: {self.out_file}.")
             if self.mode == "LEARNING_DEMO":
                 print("I save my updated model to disk at the end of every episode for demonstration purposes. This could be quite slow on your computer")
         elif self.mode == "FIXED":
-            print(f"I used to be an agent like you. My model is stored in this location: {self.in_file}.")
-            print(f"I REFUSE TO LEARN ANYTHING ELSE!")
+            print(f"I used to be an agent like you. My model is stored in this location: {self.in_file}. I REFUSE TO LEARN ANYTHING ELSE!")
         elif self.mode.startswith("RULES_IMPERFECT"):
             print(f"I play the game based on a set of simple, fixed rules. My algorithm is 'imperfect'—that is, it won't make the 'perfect' moves every time.") # It uses an em-dash because it's technically ai, do you get it? Well? Do you?
             if self.mode.endswith("NOT_LOCKED_IN"):
                 print("That said, I'm not really paying attention.")
 
-    def __init__(self, name, mode, in_file = "blank_q_learning_table.csv", out_file = "q_learning_table.csv", epsilon = 70, rewards = [0,0,0]):
+    def __init__(self, name, mode, in_file = "blank_q_learning_table.csv", out_file = "q_learning_table.csv", epsilon = 0.7, rewards = [0,0,0], epsilon_increment = 0.001):
         self.name = name
         self.in_file = in_file
         self.out_file = out_file
@@ -154,7 +153,8 @@ class Player:
         self.reward_win = rewards[0]
         self.reward_lose = rewards[1]
         self.reward_draw = rewards[2]
-        self.epsilon = epsilon # 70
+        self.epsilon = epsilon 
+        self.epsilon_increment = epsilon_increment
 
         # The following attributes accumulate over multiple episodes, so it makes sense to set them at player init
         self.wins = 0
@@ -182,6 +182,7 @@ class Player:
             looking_at_phone = False
         if tt >= 4: # Four moves have been played. After this point it's possible to win
             # The model does this regardless of whether it's locked in
+            # Is this technically a model of the environment in Reinforcement Learning terms?
             for m4 in pm: # Don't overwrite the default m from the top of the function yet
                 mr, mc = m4[0], m4[1]
                 spec_b = copy.deepcopy(b)
@@ -253,6 +254,13 @@ class Player:
             m = str(m[0]) + str(m[1])
             #print(f"{self.name} random move is {m}")
 
+
+        epsilon_increment =  0.00001 #TODO this should be configurable hyperparameter, or scale to the size of n in some way
+        if 0 <= self.epsilon - epsilon_increment: # The floor for epsilon is 0
+            self.epsilon -= epsilon_increment
+        if self.epsilon in [0.8, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]:
+            print(f"Epsilon is {self.epsilon}")
+
         b, status, description = make_move(p,b,mr,mc,tt)
         return b, status, description, m
     
@@ -271,11 +279,11 @@ class Player:
         actions_states = list(zip(self.actions, self.states))
         actions_states.reverse()
         reward_left = [self.reward_lose, self.reward_win, self.reward_draw][status]
-        positive_reinforcement = reward_left > 0
 
-        for i, reinforce_action in enumerate(self.actions):
+        for action_state in actions_states:
             # reinforce_action so named to distinguish from actions which aren't necessarily to be reinforced
-            reinforce_state = self.states[i]
+            reinforce_state = action_state[1]
+            reinforce_action = action_state[0]
             #before = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
             self.model_df.loc[self.model_df['state'] == str(reinforce_state), reinforce_action] += reward_left
             #after = self.model_df[self.model_df["state"] == str(reinforce_state)][reinforce_action]
@@ -283,12 +291,10 @@ class Player:
                 self.model_df.to_csv(self.out_file, index = False) # This will be a bit slow, but will make a cool visual
                 # if you can watch the csv update in real time
                 sleep(0.2) # Have to give your PC time to read the new file
-            if positive_reinforcement & (reward_left <= 0):
-                break
-            if (not positive_reinforcement) & (reward_left >= 0):
-                break
-        epsilon_increment = 0.001 #TODO this should be configurable hyperparameter
-        if 0 <= self.epsilon - epsilon_increment: # The floor for epsilon is 0
-            self.epsilon -= epsilon_increment
+            reward_left = reward_left / 2
 
+        #if 0 <= self.epsilon - epsilon_increment: # The floor for epsilon is 0
+        #    self.epsilon -= epsilon_increment
+        #if self.epsilon in [0.8, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]:
+        #    print(f"Epsilon is {self.epsilon}")
 
