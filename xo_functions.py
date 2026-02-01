@@ -6,6 +6,8 @@ from time import sleep
 
 columns = ["00", "01", "02", "10", "11", "12", "20", "21", "22"]
 
+GLOBAL_MODEL = pd.read_csv("blank_q_learning_table.csv")
+
 def whose_turn(state):
     cells = np.concatenate(state)
     filled_cells = len([cell for cell in cells if cell != 0])
@@ -131,13 +133,16 @@ class Player:
             print("\bYou can call me Al")
         else:
             print(f"\nHello, my name is {self.name}.")
-        if self.mode.startswith("LEARNING"):
+        if self.mode in ["LEARNING", "LEARNING_DEMO"]:
             print(f"I'm an agent in this Reinforcement Learning scenario and I learn as I play the game.")
             print(f"My initial model is stored in this location: {self.in_file}. My final model will be saved to this location: {self.out_file}.")
             if self.mode == "LEARNING_DEMO":
                 print("I save my updated model to disk at the end of every episode for demonstration purposes. This could be quite slow on your computer")
         elif self.mode == "FIXED":
             print(f"I used to be an agent like you. My model is stored in this location: {self.in_file}. I REFUSE TO LEARN ANYTHING ELSE!")
+        elif self.mode == "LEARNING_SHARING":
+            print("I'm an agent in this Reinforcement Learning scenario and I learn as I play the game.")
+            print(f"My model will be saved to this location: {self.out_file}. While it is in memory, I am sharing it with the other player")
         elif self.mode.startswith("RULES_IMPERFECT"):
             print(f"I play the game based on a set of simple, fixed rules. My algorithm is 'imperfect'—that is, it won't make the 'perfect' moves every time.") # It uses an em-dash because it's technically ai, do you get it? Well? Do you?
             if self.mode.endswith("NOT_LOCKED_IN"):
@@ -164,6 +169,8 @@ class Player:
         self.draws = 0
         self.draws_as_x = 0
         self.draws_as_o = 0
+        if self.mode.endswith("SHARING"):
+            self.model_df = GLOBAL_MODEL
     
     def sign_off(self):
         if self.mode.startswith("L"):
@@ -255,17 +262,16 @@ class Player:
             #print(f"{self.name} random move is {m}")
 
 
-        epsilon_increment =  0.00001 #TODO this should be configurable hyperparameter, or scale to the size of n in some way
+        epsilon_increment =  0.00001 #TODO this should be configurable hyperparameter, or scale to the size of n in some way # THIS WORKED
+        epsilon_increment =  0.000002 #TODO this should be configurable hyperparameter, or scale to the size of n in some way
         if 0 <= self.epsilon - epsilon_increment: # The floor for epsilon is 0
             self.epsilon -= epsilon_increment
-        if self.epsilon in [0.8, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]:
-            print(f"Epsilon is {self.epsilon}")
 
         b, status, description = make_move(p,b,mr,mc,tt)
         return b, status, description, m
     
     def make_agent_move(self,b,tt,p):
-        if self.mode in ["LEARNING", "LEARNING_DEMO", "FIXED"]:
+        if self.mode in ["LEARNING", "LEARNING_DEMO", "LEARNING_SHARING", "FIXED"]:
             return self.make_model_move(b,tt,p)
         elif self.mode.startswith("RULES_IMPERFECT"):
             if self.mode.endswith("NOT_LOCKED_IN"):
