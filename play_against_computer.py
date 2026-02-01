@@ -2,26 +2,29 @@ from xo_functions import make_player_action, make_computer_action, prettify_boar
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--opponent", help = "what model to play against")
+parser.add_argument("-o", "--opponent", help = "what policy to play against")
 args = parser.parse_args()
 opponent = args.opponent
+default_opponent = Player("THE CHAMP! (P2)","FIXED","experiments/20260201_new_champ_1.csv") # Static trained policy
 
 if opponent == "best":
-    p2 = Player("Gregg (P2)","FIXED","experiments/20260201_new_champ_1.csv") # Static trained model
+    p2 = default_opponent
 elif opponent == "rlhf":
     p2 = Player("P2","RLHF", "experiments/rlhf.csv", "experiments/rlhf.csv", 1, [2,-4,1])  # The focus here is on punishing losses The one is "epsilon" and is not relevant here
     # Long-term, no reason the players actions couldn't also update the same policy
 elif opponent == "rlhf_loser":
     # If you would like to play against and agent that has been trained to lose but which you can in theory train to play better
     p2 = Player("P2 (Loser Mode)","RLHF", "experiments/loser_rlhf.csv", "experiments/loser_rlhf.csv", 1, [2,-2,1]) # The one is "epsilon" and is not relevant here
-elif opponent == "bad":
+elif opponent == "weakly_trained":
     p2 = Player("Hennimore (P2)","FIXED","experiments/weakly_trained_2.csv")
 elif opponent == "loser":
     p2 = Player("Hennimore (P2)","FIXED","experiments/loser.csv")
 elif opponent == "rules":
     p2 = Player("Al (P2)","RULES_IMPERFECT")
-else:
+elif opponent == "random":
     p2 = Player("Gregg (P2)","FIXED","blank_q_learning_table.csv")
+else:
+    p2 = default_opponent
     
 p2.greet()
 p2.actions, p2.states = [], []
