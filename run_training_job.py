@@ -11,6 +11,7 @@ parser.add_argument("-o", "--out_file", help = "What file are you using to save 
 parser.add_argument("-n", "--number_of_episodes", help = "How many training episodes to run?")
 parser.add_argument("-r", "--rewards", help = "What rewards are applied. Format: w|l|d Sample: '[20|-10|10]' ")
 parser.add_argument("-e", "--epsilon", help = "todo")
+parser.add_argument("-ei", "--epsilon_increment", help = "todo")
 parser.add_argument("-t", "--training", help = "Are you training a model in this run: 0 for Validate Model Only, 1 for Train Model Only, 2 for Train and Validate Model")
 
 # Read arguments from command line
@@ -21,6 +22,7 @@ in_file = args.in_file
 out_file = args.out_file
 n = int(args.number_of_episodes)
 epsilon = float(args.epsilon)
+epsilon_increment = float(args.epsilon_increment)
 rewards = args.rewards.replace("[","").replace("]","").split("|")
 reward_win, reward_lose, reward_draw = rewards
 reward_win, reward_lose, reward_draw = float(reward_win), float(reward_lose), float(reward_draw)
@@ -33,10 +35,10 @@ if training > 0:
     print("Training")
     # For now, always make P1 the model player you are most interested in assesing, with p2 as the benchmark
     #p1 = Player("Tom Cruise's character from Live Die Repeat / Edge Of Tomorrow (P1)","LEARNING", in_file, out_file, epsilon, rewards)
-    p1 = Player("Tom Cruise's character from Live Die Repeat / Edge Of Tomorrow (P1)","LEARNING_SHARING", in_file, out_file, epsilon, rewards)
+    p1 = Player("Tom Cruise's character from Live Die Repeat / Edge Of Tomorrow (P1)","LEARNING_SHARING", in_file, out_file, epsilon, rewards, epsilon_increment)
     p1.greet()
     #p2 = Player("Gregg (P2)","FIXED", "experiments/20260131_new_champ_15.csv")
-    p2 = Player("Bill Murray in GroundHog Day (P1)","LEARNING_SHARING", in_file, out_file, epsilon, rewards)
+    p2 = Player("Bill Murray in GroundHog Day (P1)","LEARNING_SHARING", in_file, out_file, epsilon, rewards, epsilon_increment)
     #p2 = Player("Tom Cruise's character from Live Die Repeat / Edge Of Tomorrow (P1)","LEARNING", in_file, out_file, epsilon, rewards)
     #p2 = Player("Al (P2)",file,"RULES_IMPERFECT")
     p2.greet()
@@ -104,16 +106,18 @@ if training != 1:
     print("\n----------")
     print(f"TEST {test}: Trained model vs weakly trained model")
     print("----------")
+    # python .\run_training_job.py -i blank_q_learning_table.csv -o weakly_trained.csv --reward '[10|0|5]' -e 70 -n 100
+    # python .\run_training_job.py -o experiments/weakly_trained_2.csv -i blank_q_learning_table.csv --reward '[2|-2|1]' -e 1 -ei 0.0002 -n 1000 -t 2 # trained against self
     p1 = Player("Tom (P1)","FIXED", out_file)
     p1.greet()
-    p2 = Player("Hennimore (P2)","FIXED", "experiments/weakly_trained.csv")
+    p2 = Player("Hennimore (P2)","FIXED", "experiments/weakly_trained_2.csv")
     p2.greet()
     p1_wins, p2_wins, draws, headline = run_training_loop(p1, p2, n_validation, "ALTERNATE", 0)
     p1_validation_wins += p1_wins
     p1_validation_loses += p2_wins
     validation_draws += draws
     validation_headlines.append(headline)
-    # python .\run_training_job.py -i blank_q_learning_table.csv -o weakly_trained.csv --reward '[10|0|5]' -e 70 -n 100
+    
 
     test += 1
     print("\n----------")
@@ -121,7 +125,7 @@ if training != 1:
     print("----------")
     p1 = Player("Tom (P1)","FIXED", out_file)
     p1.greet()
-    p2 = Player("The Champ (P2)","FIXED", "experiments/the_champ.csv")
+    p2 = Player("The Champ (P2)","FIXED", "experiments/20260201_new_champ_1.csv")
     p2.greet()
     p1_wins, p2_wins, draws, headline = run_training_loop(p1, p2, n_validation, "ALTERNATE", 0)
     p1_validation_wins += p1_wins
