@@ -21,7 +21,7 @@
 
 ## Nice-To-Haves
 - rename "status" to something more descriptive
-- change board to state where possible
+- switch to more reinforcement learning standard terminology where applicable: board to state, move to action and (I think) model to policy
 - check_for_winner should highlight what type of victory it was
     - maybe make a separate version for the training process that doesn't do this
     - prettify_board should display the winning line somehow also
@@ -41,3 +41,4 @@
 - implement a version of run_game.py script where the model is not allowed to choose 1,1 as it's first move, for variety
 - ~~allow players to use the more intuitive a1, b2, c1 etc for "0,0", "1,1" and "2,0" respectively~~
 - Mode to allow p1 and p2 to play against eachother, but sharing the same model dataframe (meaning the model could learn from both sides of the game)
+- It is probably not necessary to "build" the empty q-learning table at all. New rows could just be added during training.
