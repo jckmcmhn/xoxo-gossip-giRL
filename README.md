@@ -3,7 +3,7 @@ My goal with this project is to create and train a simple Reinforcement Learning
 
 I did this to learn about Reinforcement Learning. That learning is still an ongoing process for me, in RL terms I have many more training episodes to go, so some of the jargon or details may not be entirely correct or "best-in-class". That being said, I am fairly sure that what I've created here is a "model-free" "Q-learning" approach that builds a "policy"<sup>1</sup> using an "Epsilon-Greedy" algorithm. If I've got these terms wrong, please write in.
 
-My interest in this topic was sparked by a [conference](https://www.aiandgamesconference.com/) I attended last year and a great book called ["Artificial Intelligence: A Guide for Thinking Humans"](https://melaniemitchell.me/aibook/) by Melanie Mitchell, I would recommend checking both of them out!
+My recent interest in this topic was sparked by attending the [2025 AI and Games Conference](https://www.aiandgamesconference.com/) where I saw a lot of really interesting talks on Reinforcement Learning and by reading a great book called ["Artificial Intelligence: A Guide for Thinking Humans"](https://melaniemitchell.me/aibook/) by Melanie Mitchell. I would recommend checking both of them out!
 
 ## Try It Out!
 ### Play Against the Agent
