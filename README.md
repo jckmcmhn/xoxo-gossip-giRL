@@ -14,7 +14,7 @@ To play against the agent, just run
 There is an --opponent (-o) argument for determing which "agent" you play against.
 - best: **"THE CHAMP!"**. This is the currently best performing agent
 - rlhf: This is a copy of **THE CHAMP**. Your game against it will be used to update its game playing policy.
-- loser: **"LOSER MODE"**. This agent was trained with the same intensity as THE CHAMP, but was rewarded for losing games and punished for winning them
+- loser: **"LOSER MODE"**. This agent was trained with the same intensity as **THE CHAMP**, but was rewarded for losing games and punished for winning them
 - rlhf_loser: This is a copy of the **LOSER MODE** agent. Your game against it will be used to update its game playing policy so that it will start to play better. Could take years though, so not for the faint of heart...
 - rules: This agent plays using an incomplete set of rules for playing the game. It doesn't play a perfect game, but it will, for example, always take a winning move if it can. No reinforcement learning was involved in creating this one.
 - random: The computer picks (valid) moves at random
@@ -38,7 +38,7 @@ The way this learning algorithm works is as follows:
   - If a reward has been configured for losing or draws, the same process is carried out.
   - This should mean that moves that win the game have very high values and the moves that led up to that position should have relatively high values also
     - For example, while I could not always get the policies to take a corner piece on the first turn (which is apparently the 'correct' move) they did consistently favour the middle square on the first move
-  - Moves taken right before an opponent made a winning move should have very low values and the moves that led up to that position such have relatively low values
+  - Moves taken right before an opponent made a winning move should have very low values and the moves that led up to that position should have relatively low values
   - Moves that lead to draws (which I have tended to reward slightly less than winning) should have values in the middle
 
 ## Corrections and Know Issues
