@@ -45,14 +45,14 @@ The way this learning algorithm works is as follows:
 ### Theory
 I realised a little too late into the project that I'd oversimplified some of the theory.
 
-However, in "Reinforcement Learning: An Introduction" by Richard S. Sutton and Andrew G. Barto, the authors say that:
+However, in "Reinforcement Learning: An Introduction" by Richard S. Sutton and Andrew G. Barto, the authors say the following (emphasis mine):
 
-> the basic idea \[of reinforcement learning\] is simply to capture the most important aspects of the real problem facing a learning agent interacting with its environment to achieve a goal. Clearly, such an agent must be able to sense the state of the environment to some extent and must be able to take actions that affect the state. The agent also must have a goal or goals relating to the state of the environment.... Any method that is well suited to solving this kind of problem we consider to be a reinforcement learning method
+> the basic idea \[of reinforcement learning\] is simply to capture the most important aspects of the real problem facing a learning agent interacting with its environment to achieve a goal. Clearly, such an agent must be able to sense the state of the environment to some extent and must be able to take actions that affect the state. The agent also must have a goal or goals relating to the state of the environment.... *Any method that is well suited to solving this kind of problem we consider to be a reinforcement learning method*
 
 The script does learn how to play Xs and Os (albeit not perfectly, see below) so I'd consider this a (partial) success.
 
-From my reading, it seems that the usual thing to do is to update the policy table per iteration (at the end of each turn), not per episode which is what I'm doing here.
-On the other hand:
+The script updates the policy at the end of each episode, not the after each iteration or step.
+However:
 - Xs and Os is strictly linear. Within a single game, there is no way to find yourself back at a position you were in previously, so I would argue there's no need to update the policy before a game is over
 - Players can make at max 5 or 4 moves per game, so it is not as if a lot of iterations pass before each update anyway
 
