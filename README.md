@@ -1,7 +1,7 @@
 # xoxo-gossip-giRL
 My goal with this project is to create and train a simple Reinforcement Learning Model from scratch that is able to play the classic pencil-and-paper game "Xs and Os" (which you may know by the name "Tic-Tac-Toe" or "Noughts and Crosses").
 
-I did this to learn about Reinforcement Learning. That learning is still an ongoing process for me, in RL terms I have many more training episodes to go, so some of the jargon or details may not be entirely correct or "best-in-class". That being said, I am fairly sure that what I've created here is a "model-free", "policy-based" approach which uses an "Epsilon-Greedy" algorithm. If I've got these terms wrong, please write in.
+I did this to learn about Reinforcement Learning. That learning is still an ongoing process for me, in RL terms I have many more training episodes to go, so some of the jargon or details may not be entirely correct or "best-in-class". That being said, I am fairly sure that what I've created here is a "model-free" approach which uses an "Epsilon-Greedy" algorithm. If I've got these terms wrong, please write in.
 
 My recent interest in this topic was sparked by attending the [2025 AI and Games Conference](https://www.aiandgamesconference.com/) where I saw a lot of really interesting talks on Reinforcement Learning and by reading a great book called ["Artificial Intelligence: A Guide for Thinking Humans"](https://melaniemitchell.me/aibook/) by Melanie Mitchell. I would recommend checking both of them out!
 
@@ -32,18 +32,20 @@ I developed all of this on what I'd say is an entry-level pre-built gaming PC fr
 ## The Algorithm
 
 The way this learning algorithm works is as follows:
+- At the start of the training process a table is initialised containing every possible state-action pair. Each state-action pair is given an initial value of 0
 - Players play until the game ends, either p1 wins, p2 wins or 9 moves are made without anyone winning<sup>1</sup>.
 - If one or both players are set as learning agents:
-  - If a reward has been configured for winning, the script takes the winning player's actions and works backwards through them. The last action gets the full reward value, the one before that gets slightly less of the reward value and so on
+  - If a reward has been configured for winning, the script takes the winning player's state-action pairs and works backwards through them. The last state-action gets the full reward value, the one before that gets slightly less of the reward value and so on
   - If a reward has been configured for losing or draws, the same process is carried out.
   - This should mean that moves that win the game have very high values and the moves that led up to that position should have relatively high values also
     - For example, while I could not always get the policies to take a corner piece on the first turn (which is apparently the 'correct' move) they did consistently favour the middle square on the first move
   - Moves taken right before an opponent made a winning move should have very low values and the moves that led up to that position should have relatively low values
   - Moves that lead to draws (which I have tended to reward slightly less than winning) should have values in the middle
+- The training process follows an epsilon-greedy algorithm: the learning agent makes most of its moves at random at the start of the process, but overtime it uses the currently best rated action in the table when making its moves
 
 ## Corrections and Know Issues
 ### Theory
-I realised a little too late into the project that I'd oversimplified some of the theory.
+I realised a little too late into the project that I'd oversimplified a lot of the theory.
 
 However, in "Reinforcement Learning: An Introduction" by Richard S. Sutton and Andrew G. Barto, the authors say the following (emphasis mine):
 
@@ -51,7 +53,7 @@ However, in "Reinforcement Learning: An Introduction" by Richard S. Sutton and A
 
 The script does learn how to play Xs and Os (albeit not perfectly, see below) so I'd consider this a (partial) success.
 
-The script updates the policy at the end of each episode, not the after each iteration or step.
+I think what I have here is a very dumbed-down Q-learning approach. But based on my reading, Q-learning usually updates the q-value a state-action pair after each step, not each episode as I've done here.
 However:
 - Xs and Os is strictly linear. Within a single game, there is no way to find yourself back at a position you were in previously, so I would argue there's no need to update the policy before a game is over
 - Players can make at max 5 or 4 moves per game, so it is not as if a lot of iterations pass before each update anyway
@@ -67,7 +69,4 @@ This bothers me as well. According to the XOXOlogists out there, the "perfect" f
 
 There is maybe an argument to be made that the middle sqaure is the best first square for X when you're playing against an average player and that a corner square is the best choice if playing against a player who always plays "perfectly", but that's a whole other thing.
 
-### Names
-I'm still working through the theory, but as mentioned above I'm pretty sure this approach is closer to a policy-based approach than a value-based one. So I probably should not have used the term "Q Learning Table" in the code, fixing that is on the to-do list.
-
-<sup>1</sup>: I realise it's possible to identify if a draw will happen sooner than this, that's also on the to-do list
+<sup>1</sup>: I realise it's possible to identify if a draw will happen sooner than this, that's on the to-do list
