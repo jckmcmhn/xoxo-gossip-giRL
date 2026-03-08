@@ -5,6 +5,8 @@ I did this to learn about Reinforcement Learning. That learning is still an ongo
 
 My recent interest in this topic was sparked by attending the [2025 AI and Games Conference](https://www.aiandgamesconference.com/) where I saw a lot of really interesting talks on Reinforcement Learning and by reading a great book called ["Artificial Intelligence: A Guide for Thinking Humans"](https://melaniemitchell.me/aibook/) by Melanie Mitchell. I would recommend checking both of them out!
 
+I've since made another, more streamlined, less hubristic, attempt at this idea, (here it is)[https://github.com/jckmcmhn/xo-gymnasium].
+
 ## Try It Out!
 ### Play Against the Agent
 To play against the agent, just run
